@@ -1,0 +1,21 @@
+# Ignore all
+*
+# Unignore all with extensions
+!*.*
+# Unignore all dirs
+!*/
+# Combination above ignores all files without extenstion
+
+# Ignore vscode files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Ignore mac files
+.ds_store
+
+#Ignore vcds
+*.vcd
