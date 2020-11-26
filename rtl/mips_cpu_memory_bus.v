@@ -15,7 +15,7 @@ module mips_cpu_memory_bus
     timeunit 1ns/10ps;
     parameter RAM_INIT_FILE ="";
 
-    reg[7:0] memory [4294967295:0];
+    reg[7:0] memory [0:4294967295];
 
     initial begin
         integer i;
@@ -30,7 +30,7 @@ module mips_cpu_memory_bus
 
 
     always_ff @(posedge clk) begin
-        if(write) begin
+        if(write && !read) begin
             case(byteenable)
                 4'b1111: begin
                     memory[addr]<=writedata[0:7];
@@ -62,7 +62,7 @@ module mips_cpu_memory_bus
                 end
             endcase
         end
-        if(read)begin
+        if(read && !write)begin
             case(byteenable)
                 4'b1111: begin
                     readdata[0:7]<=memory[addr];
