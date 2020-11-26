@@ -1,0 +1,1 @@
+ram init file for addiu_1
