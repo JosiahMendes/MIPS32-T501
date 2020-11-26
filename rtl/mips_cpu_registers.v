@@ -21,7 +21,7 @@ module mips_cpu_registers
 
     assign rdDataA = (reset == 1) ? 0 : Register[rdAddrA]; //combinatorial read
     assign rdDataB = (reset == 1) ? 0 : Register[rdAddrB];
-    assign register_v0 = Register[2]  // combinatorially puts register_v0 into an outputable entity
+    assign register_v0 = Register[2];  // combinatorially puts register_v0 into an outputable entity
 
     initial begin
         Register[0] <= 0; //ensure that zero register is hardcoded to 0
