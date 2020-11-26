@@ -1,1 +1,0 @@
-ram init file for addi_1
