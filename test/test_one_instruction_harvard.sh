@@ -9,8 +9,30 @@ if test -d "test/testcases/${INSTR}" ; then
     #loop through every testcases available
     TESTCASES="test/testcases/${INSTR}/*.v"
     for i in ${TESTCASES} ; do
-        TESTNAME=$(basename ${i} .v)
-        >&2 echo "${TESTNAME} ${INSTR}"
+        #get the testnames
+        TESTNAME=$(basename ${i} _tb.v)
+
+        #compile the testbench for this testname
+        iverilog -g 2012 \
+        -s ${TESTNAME}_tb \
+        -P${TESTNAME}_tb.RAM_INIT_FILE=\"test/testcases/${INSTR}/${TESTNAME}_ram_init.txt\" \
+        -o test/testcases/${INSTR}/${TESTNAME} \
+        rtl/mips_cpu*.v test/testcases/${INSTR}/${TESTNAME}_tb.v
+
+        set +e
+        #run this testname
+        test/testcases/${INSTR}/${TESTNAME}
+
+        #capture the exit code of the testbench in a variable
+        RESULT=$?
+        set -e
+
+        #if it returned a failure code
+        if [[ "${RESULT}" -ne 0 ]] ; then
+            echo "${TESTNAME} ${INSTR} Fail"
+        else
+            echo "${TESTNAME} ${INSTR} Pass"
+        fi
     done
 else
     >&2 echo "Invalid instruction"
