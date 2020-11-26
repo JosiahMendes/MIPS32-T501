@@ -17,7 +17,7 @@ if test -d "test/testcases/${INSTR}" ; then
         -s ${TESTNAME}_tb \
         -P${TESTNAME}_tb.RAM_INIT_FILE=\"test/testcases/${INSTR}/${TESTNAME}_ram_init.txt\" \
         -o test/testcases/${INSTR}/${TESTNAME} \
-        rtl/mips_cpu*.v test/testcases/${INSTR}/${TESTNAME}_tb.v
+        ${SRC}/mips_cpu*.v test/testcases/${INSTR}/${TESTNAME}_tb.v
 
         set +e
         #run this testname
