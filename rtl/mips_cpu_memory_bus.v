@@ -43,38 +43,6 @@ module mips_cpu_memory_bus
                     memory[addr+1]<=writedata[8:15];
                 end
                 4'b1100: begin
-                    memory[addr+2]<=writedata[0:7];
-                    memory[addr+3]<=writedata[8:15];
-                end
-                4'b0001:begin
-                    memory[addr]<=writedata[0:7];
-                end
-                4'b0010:begin
-                    memory[addr+1]<=writedata[0:7];
-                end
-                4'b0100:begin
-                    memory[addr+2]<=writedata[0:7];
-                end
-                4'b1000:begin
-                    memory[addr+3]<=writedata[0:7];
-                end
-                default: begin 
-                end
-            endcase
-        end
-        if(read)begin
-            case(byteenable)
-                4'b1111: begin
-                    readdata[0:7]<=memory[addr];
-                    readdata[8:15]<=memory[addr+1];
-                    readdata[16:23]<=memory[addr+2];
-                    readdata[24:31]<=memory[addr+3];
-                end
-                4'b0011: begin
-                    memory[addr]<=writedata[0:7];
-                    memory[addr+1]<=writedata[8:15];
-                end
-                4'b1100: begin
                     memory[addr]<=writedata[16:23];
                     memory[addr+1]<=writedata[24:31];
                 end
@@ -89,6 +57,38 @@ module mips_cpu_memory_bus
                 end
                 4'b1000:begin
                     memory[addr]<=writedata[24:31];
+                end
+                default: begin 
+                end
+            endcase
+        end
+        if(read)begin
+            case(byteenable)
+                4'b1111: begin
+                    readdata[0:7]<=memory[addr];
+                    readdata[8:15]<=memory[addr+1];
+                    readdata[16:23]<=memory[addr+2];
+                    readdata[24:31]<=memory[addr+3];
+                end
+                4'b0011: begin
+                    readdata[0:7]<=memory[addr];
+                    readdata[8:15]<=memory[addr+1];
+                end
+                4'b1100: begin
+                    readdata[0:7]<=memory[addr+2];
+                    readdata[8:15]<=memory[addr+3];
+                end
+                4'b0001:begin
+                     readdata[0:7]<=memory[addr];
+                end
+                4'b0010:begin
+                    readdata[0:7]<=memory[addr+1];
+                end
+                4'b0100:begin
+                    readdata[0:7]<=memory[addr+2];
+                end
+                4'b1000:begin
+                    readdata[0:7]<=memory[addr+3];
                 end
                 default: begin
                 end
