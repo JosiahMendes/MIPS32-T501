@@ -19,3 +19,5 @@ module mips_cpu_harvard(
     output logic[31:0]  data_writedata,
     input logic[31:0]  data_readdata
 );
+
+endmodule
