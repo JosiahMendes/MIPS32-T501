@@ -19,14 +19,53 @@ module ALU_harvard_tb();
         end
     end
 
-    localparam integer STEPS_add = 10000;
+    localparam integer STEPS = 10000;
 
     initial begin
         ALUsel = 3'b010; //alu control input for addition
         a = 0;
         b = 0;
 
-        repeat (STEPS_add) begin
+        repeat (STEPS) begin
+            @(posedge clk) #9;
+            a = a+32'h23456789;
+            b = b+32'h34567891;
+        end
+        #9;
+        a = 32'hffffffff;
+        b = 32'hffffffff;
+
+        ALUsel = 3'b011; //alu control input for subtraction
+        a = 0;
+        b = 0;
+
+        repeat (STEPS) begin
+            @(posedge clk) #9;
+            a = a+32'h23456789;
+            b = b+32'h34567891;
+        end
+        #9;
+        a = 32'hffffffff;
+        b = 32'hffffffff;
+
+        ALUsel = 3'b000; //alu control input for AND
+        a = 0;
+        b = 0;
+
+        repeat (STEPS) begin
+            @(posedge clk) #9;
+            a = a+32'h23456789;
+            b = b+32'h34567891;
+        end
+        #9;
+        a = 32'hffffffff;
+        b = 32'hffffffff;
+
+        ALUsel = 3'b001; //alu control input for OR
+        a = 0;
+        b = 0;
+
+        repeat (STEPS) begin
             @(posedge clk) #9;
             a = a+32'h23456789;
             b = b+32'h34567891;
@@ -40,10 +79,27 @@ module ALU_harvard_tb();
     initial begin
         @(posedge clk);
 
-        repeat (STEPS_add) begin
+        repeat (STEPS) begin
             @(posedge clk) #1;
             assert(r == a+b) else $fatal(2,"Wrong output");
         end
+
+        repeat (STEPS) begin
+            @(posedge clk) #1;
+            assert(r == a-b) else $fatal(2,"Wrong output");
+        end
+
+        repeat (STEPS) begin
+            @(posedge clk) #1;
+            assert(r == a&b) else $fatal(2,"Wrong output");
+        end
+
+        repeat (STEPS) begin
+            @(posedge clk) #1;
+            assert(r == a|b) else $fatal(2,"Wrong output");
+        end
+
+        $display("Working as expected");
         $finish;
     end
 
