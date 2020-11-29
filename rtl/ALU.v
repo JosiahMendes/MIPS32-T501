@@ -3,7 +3,7 @@ module ALU (
   input logic [2:0] op,
   input logic [31:0] a,
   input logic [31:0] b,
-  output logic [31:0] result,
+  output logic [31:0] result
   // output logic zero -> not yet sure if we are using it or not
 
 );
