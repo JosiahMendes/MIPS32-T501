@@ -1,12 +1,24 @@
+`include "rtl/ALU.v"
+
 module mux_ALU (
-
-  input logic mux_ALU_ctrl,
-  input logic [31:0] from_arithmetic_instr,
-  input logic [31:0] from_load_instr,
-  output logic [31:0] mux_ALU_result
-
+  input logic ALUmux,
+  input logic [3:0] ALUop,
+  input logic [31:0] a, b, c,
+  output logic [31:0] ALUout,
+  output logic ALUzero
 );
 
-  assign mux_ALU_result = mux_ALU_ctrl ? from_arithmetic_instr : from_load_instr;
+  logic[31:0] source1, source2;
+
+  assign source1 = a;
+  assign source2 = (ALUmux) ? c : b;
+
+  ALU sym(
+    .op(ALUop),
+    .a(source1),
+    .b(source2),
+    .result(ALUout),
+    .zero(ALUzero)
+  );
 
 endmodule
