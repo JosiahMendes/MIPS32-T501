@@ -1,4 +1,4 @@
-module cpu_bus_tb.v;
+module cpu_bus_tb;
     logic clock;
     logic rst;
 
