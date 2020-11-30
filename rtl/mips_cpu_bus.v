@@ -16,27 +16,27 @@ module cpu_bus (
 );
 
 
-
     // This wire holds the whole instruction
     logic[32-1:0] instr;
-    assign instr_opcode = instr[31:26]; // This is common to all instruction formats
+
+    wire [5:0]  instr_opcode    = instr[31:26]; // This is common to all instruction formats
 
     // The remaining parts of the instruction depend on the type (R,I,J)
 
     // R-format instruction sub-sections
-    logic[4:0]  R_instr_rs    = instr[25:21];
-    logic[4:0]  R_instr_rt    = instr[20:16];
-    logic[4:0]  R_instr_rd    = instr[15:11];
-    logic[4:0]  R_instr_shamt = instr[10:6];
-    logic[5:0]  R_instr_func  = instr[5:0];
+    wire [4:0]  R_instr_rs          = instr[25:21];
+    wire [4:0]  R_instr_rt          = instr[20:16];
+    wire [4:0]  R_instr_rd          = instr[15:11];
+    wire [4:0]  R_instr_shamt       = instr[10:6];
+    wire [5:0]  R_instr_func        = instr[5:0];
 
     // I-format instruction sub-sections
-    logic[4:0]  I_instr_rs        = instr[25:21];
-    logic[4:0]  I_instr_rt        = instr[20:16];
-    logic[15:0] I_instr_immediate = instr[15:0];
+    wire [4:0]  I_instr_rs          = instr[25:21];
+    wire [4:0]  I_instr_rt          = instr[20:16];
+    wire [15:0] I_instr_immediate   = instr[15:0];
 
     // J-format instruction sub-sections
-    logic[4:0]  J_instr_addr  = instr[25:0];
+    wire [25:0]  J_instr_addr        = instr[25:0];
 
     // Instruction opcode is enumerated
     typedef enum logic[8-1:0] {
@@ -46,16 +46,11 @@ module cpu_bus (
         // ... rest added here
     } opcode_t;
 
-    opcode_t instr_opcode; // The instr_opcode is now accessible via the enum string names
-
-
     // Statemachine -> MIPS uses a maximum of 5 states. Starting off with decimal state indexes (0-4)
     logic [2:0] state;
 
-    
-
     // This is the simple state machine. The state switching is just drafted, and will depend on the individual instructions
-    @always @(posedge clk) begin
+    always @(posedge clk) begin
         if (rst) begin
             state <= 4'd0;
         end
