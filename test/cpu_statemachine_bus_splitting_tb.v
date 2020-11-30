@@ -1,6 +1,6 @@
-module cpu_bus(
-    input logic clk,
-    input logic rst,
+// This test is based on the following commit: 2e249fd2105625e70fbf9e32d2a4fa76f951f4dd
+
+module cpu_statemachine_bus_splitting_tb (
 
     output logic active,
     output logic[31:0] register_v0,
@@ -14,6 +14,57 @@ module cpu_bus(
     output logic[3:0] byteenable,
     input logic[31:0] readdata
 );
+
+
+    ///////////// Inline test code, as the internal signals in the CPU are being tested, there is no external testbench possible.
+
+    logic rst;
+    logic clk;
+
+
+    parameter TIMEOUT_CYCLES = 15;
+
+    // Generate clock
+    initial begin
+        clk=0;
+        rst=1;
+
+        repeat (TIMEOUT_CYCLES) begin
+            #10;
+            clk = !clk;
+            #10;
+            clk = !clk;
+        end
+
+        $fatal(2, "Simulation did not finish within %d cycles.", TIMEOUT_CYCLES);
+    end
+
+    always @(posedge clk) begin
+        #1
+        $display(state);
+        instr <= 32'b00100100000111110000011111000000; // uncomment to test R-type
+        //instr <= 32'b11111100000111110000000000000000; // uncomment to test I-type
+        //instr <= 32'b11111100000000000000000000000000; // uncomment to test J-type
+        $display("Whole instruction:    %b", instr);
+        $display("opcode:               %b", instr_opcode);
+
+        $display("R_instr_rs:           %b", R_instr_rs);
+        $display("R_instr_rt:           %b", R_instr_rt);
+        $display("R_instr_rd:           %b", R_instr_rd);
+        $display("R_instr_shamt:        %b", R_instr_shamt);
+        $display("R_instr_func:         %b", R_instr_func);
+
+        $display("I_instr_rs:           %b", I_instr_rs);
+        $display("I_instr_rt:           %b", I_instr_rt);
+        $display("I_instr_immediate:    %b", I_instr_immediate);
+
+        $display("J_instr_addr:         %b", J_instr_addr);
+
+
+    end
+
+
+    /////////////
 
     // This wire holds the whole instruction
     logic[32-1:0] instr;
@@ -67,6 +118,7 @@ module cpu_bus(
         end
         if (state==4'd4) begin
             state <= 4'd0;
+            $finish; // For testing only:
         end
     end
 
