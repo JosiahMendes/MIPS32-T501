@@ -1,3 +1,5 @@
+`include "rtl/mips_cpu_bus.v"
+//`include "rtl/mips_cpu_bus_memory.v"
 module mips_cpu_bus_tb;
     timeunit 1ns / 10ps;
 
@@ -9,19 +11,32 @@ module mips_cpu_bus_tb;
 
     logic active;
 
-    logic[31:0] address;
     logic write;
     logic read;
+    logic waitrequest;
     logic[31:0] writedata;
     logic[31:0] readdata;
     logic[31:0] register_v0;
+    logic[3:0] byteenable;
+    logic[31:0] CPUaddress;
+    logic[23:0] RAMaddress;
 
-    //RAM_16x4096_del31y1 #(RAM_INIT_FILE) ramInst(.clk(clk), .address(address), .write(write), .read(read), .writedata(writedata), .readdata(readdata)); //would initialise a ram module
+    assign RAMaddress = CPUaddress-32'hBFC00000;
 
-    //CPU_MU0_delay1 cpuInst(.clk(clk), .reset(reset), .active(active), .address(address), .write(write), .read(read), .writedata(writedata), .readdata(readdata), register_v0); // initialise a mips cpu module
+    mips_cpu_bus_memory #(RAM_INIT_FILE) ramInst(.clk(clk), .write(write), .read(read), 
+        .writedata(writedata), .addr(RAMaddress), .byteenable(byteenable),
+        .waitrequest(waitrequest), .readdata(readdata)
+    ); //would initialise a ram module
+
+    cpu_bus cpuInst(.clk(clk), .rst(reset), .active(active), .waitrequest(waitrequest),
+        .address(CPUaddress), .write(write), .read(read), 
+        .writedata(writedata), .readdata(readdata), .byteenable(byteenable),
+        .register_v0(register_v0)
+    ); // initialise a mips cpu module
 
     // Generate clock
     initial begin
+        $display("Simulation Starting");
         clk=0;
 
         repeat (TIMEOUT_CYCLES) begin
@@ -48,10 +63,13 @@ module mips_cpu_bus_tb;
         else $display("TB : CPU did not set active=1 after reset.");
 
         while (active) begin
-            @(posedge clk);
+            @(posedge clk)begin
+            end
         end
 
         $display("TB : finished; active=0");
+        $display("Register V0 has %h",register_v0);
+        
 
         $finish;
 

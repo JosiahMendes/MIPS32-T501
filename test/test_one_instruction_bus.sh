@@ -13,8 +13,8 @@ if test -d "test/testcases/${INSTR}" ; then
         TESTNAME=$(basename ${i} _tb.v)
 
         #compile the testbench for this testname
-        iverilog -g 2012 \
-        -s ${TESTNAME}_tb \
+        iverilog -g 2012 -Wall\
+        -s test/mips_cpu_bus_tb \
         -P${TESTNAME}_tb.RAM_INIT_FILE=\"test/testcases/${INSTR}/${TESTNAME}_ram_init.txt\" \
         -o test/testcases/${INSTR}/${TESTNAME} \
         ${SRC}/mips_cpu_bus_*.v test/testcases/${INSTR}/${TESTNAME}_tb.v
