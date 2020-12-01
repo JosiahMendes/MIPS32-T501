@@ -2,10 +2,13 @@ module ALU_harvard_tb();
 
     logic clk;
 
+    logic ALUmux = 0;
     logic[31:0] a;
     logic[31:0] b;
-    logic[31:0] r;
-    logic[2:0] ALUsel;
+    logic[31:0] c = 0;
+    logic[31:0] ALUout;
+    logic[3:0] ALUop;
+    logic ALUzero;
 
     initial begin
         $dumpfile("test/modules/alu_harvard_tb.vcd");
@@ -22,91 +25,130 @@ module ALU_harvard_tb();
     localparam integer STEPS = 10000;
 
     initial begin
-        ALUsel = 3'b010; //alu control input for addition
+        ALUop = 4'b0010; //alu control input for addition
         a = 0;
         b = 0;
+        @(posedge clk) #9;
 
         repeat (STEPS) begin
-            @(posedge clk) #9;
             a = a+32'h23456789;
             b = b+32'h34567891;
+            @(posedge clk) #9;
         end
-        #9;
+
         a = 32'hffffffff;
         b = 32'hffffffff;
+        @(posedge clk) #9;
 
-        ALUsel = 3'b011; //alu control input for subtraction
+        ALUop = 4'b0011;//alu control input for subtraction
         a = 0;
         b = 0;
+        @(posedge clk) #9;
 
         repeat (STEPS) begin
-            @(posedge clk) #9;
             a = a+32'h23456789;
             b = b+32'h34567891;
+            @(posedge clk) #9;
         end
-        #9;
+
         a = 32'hffffffff;
         b = 32'hffffffff;
+        @(posedge clk) #9;
 
-        ALUsel = 3'b000; //alu control input for AND
+        ALUop = 4'b0000;//alu control input for AND
         a = 0;
         b = 0;
+        @(posedge clk) #9;
 
         repeat (STEPS) begin
-            @(posedge clk) #9;
             a = a+32'h23456789;
             b = b+32'h34567891;
+            @(posedge clk) #9;
         end
-        #9;
+
         a = 32'hffffffff;
         b = 32'hffffffff;
+        @(posedge clk) #9;
 
-        ALUsel = 3'b001; //alu control input for OR
+        ALUop = 4'b0001;//alu control input for OR
         a = 0;
         b = 0;
+        @(posedge clk) #9;
 
         repeat (STEPS) begin
-            @(posedge clk) #9;
             a = a+32'h23456789;
             b = b+32'h34567891;
+            @(posedge clk) #9;
         end
-        #9;
+
         a = 32'hffffffff;
         b = 32'hffffffff;
+        @(posedge clk) #9;
+
+        ALUop = 4'b0101;//alu control input for XOR
+        a = 0;
+        b = 0;
+        @(posedge clk) #9;
+
+        repeat (STEPS) begin
+            a = a+32'h23456789;
+            b = b+32'h34567891;
+            @(posedge clk) #9;
+        end
+
+        a = 32'hffffffff;
+        b = 32'hffffffff;
+        @(posedge clk) #9;
+
     end
 
     // check output of ALU
     initial begin
-        @(posedge clk);
+        $display("Testing addition");
 
-        repeat (STEPS) begin
+        repeat (STEPS+2) begin
             @(posedge clk) #1;
-            assert(r == a+b) else $fatal(2,"Wrong output");
+            assert(ALUout == a+b) else $fatal(2,"a=%d, b=%d, r=%d",a,b,ALUout);
         end
 
-        repeat (STEPS) begin
+        $display("Testing subtraction");
+
+        repeat (STEPS+2) begin
             @(posedge clk) #1;
-            assert(r == a-b) else $fatal(2,"Wrong output");
+            assert(ALUout == a-b) else $fatal(2,"a=%d, b=%d, r=%d",a,b,ALUout);
         end
 
-        repeat (STEPS) begin
+        $display("Testing AND");
+
+        repeat (STEPS+2) begin
             @(posedge clk) #1;
-            assert(r == a&b) else $fatal(2,"Wrong output");
+            assert(ALUout == a&b) else $fatal(2,"a=%d, b=%d, r=%d",a,b,ALUout);
         end
 
-        repeat (STEPS) begin
+        $display("Testing OR");
+
+        repeat (STEPS+2) begin
             @(posedge clk) #1;
-            assert(r == a|b) else $fatal(2,"Wrong output");
+            assert(ALUout == a|b) else $fatal(2,"a=%d, b=%d, r=%d",a,b,ALUout);
+        end
+
+        $display("Testing XOR");
+
+        repeat (STEPS+2) begin
+            @(posedge clk) #1;
+            assert(ALUout == a^b) else $fatal(2,"a=%d, b=%d, r=%d",a,b,ALUout);
         end
 
         $display("Working as expected");
         $finish;
     end
 
-    ALU test_unit(
-            .op(ALUsel),
-            .a(a), .b(b),  // ALU 32-bit Inputs
-            .result(r) // ALU 32-bit Output
+    mux_ALU test_unit(
+            .ALUmux(ALUmux),
+            .ALUop(ALUop),
+            .a(a), .b(b), .c(c), // ALU 32-bit Inputs
+            .ALUout(ALUout), // ALU 32-bit Output
+            .ALUzero(ALUzero)
     );
 
 endmodule
