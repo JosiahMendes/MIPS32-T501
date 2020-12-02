@@ -1,15 +1,16 @@
-RAM : INIT : Loading RAM contents from ...
-ERROR: rtl/mips_cpu_bus_memory.v:27: $readmemh: Unable to open ... for reading.
-RAM: first word is 00 00 00 00
+RAM : INIT : Loading RAM contents from test/testcases/addiu/addiu.txt
+RAM: first word is 0f 00 02 25
 Simulation Starting
 CPU Resetting
 CPU 1, fetching instruction @ bfc00000
 Registers reset
-CPU 2 input= 00000000, reading from reg xx
+CPU 2 input= 2502000f, reading from reg xx
 CPU 3, regA out=00000000, regB out = 00000000
-CPU 4 ALUa = 00000000, ALUb= 00000000, instr_im =0000, ALUOut = 00000000, lol
-CPU 5 ALUOut = 00000000, rs =  0, trying to write to  x
+CPU 4 ALUa = 00000000, ALUb= 0000000f, instr_im =000f, ALUOut = 0000000f, lol
+CPU 5 ALUOut = 0000000f, rs =  2, trying to write to  x
+Register  2 being written to with data 0000000f
 CPU 1, fetching instruction @ bfc00004
 TB : finished; active=0
-Register V0 has 00000000
-CPU 2 input= 00000000, reading from reg 00
+Register V0 has 0000000f
+CPU 2 input= 00000000, reading from reg 08
+Register  2 being written to with data 0000000f

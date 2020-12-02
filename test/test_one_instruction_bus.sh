@@ -15,7 +15,7 @@ if test -d "test/testcases/${INSTR}" ; then
         #compile the testbench for this testname
         iverilog -g 2012 \
         -s mips_cpu_bus_tb \
-        -P test/mips_cpu_bus_tb.RAM_INIT_FILE=\"test/testcases/${INSTR}/${TESTNAME}.txt\" \
+        -P mips_cpu_bus_tb.RAM_INIT_FILE=\"test/testcases/${INSTR}/${TESTNAME}.txt\" \
         -o test/testcases/${INSTR}/${TESTNAME} \
         ${SRC}/mips_cpu_ALU.v ${SRC}/mips_cpu_bus_memory.v ${SRC}/mips_cpu_registers.v test/mips_cpu_bus_tb.v
 
