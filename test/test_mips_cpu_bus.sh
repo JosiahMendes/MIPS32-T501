@@ -1,6 +1,9 @@
 #!/bin/bash
 set -eou pipefail
 
+chmod u+x test/test_all_instructions_bus.sh
+chmod u+x test/test_one_instruction_bus.sh
+
 SRC="$1"
 #check if source directory is valid
 if test -f "${SRC}/mips_cpu_bus.v" ; then
