@@ -6,6 +6,8 @@ module mips_cpu_ALU (
   output logic zero
 
 );
+  timeunit 1ns / 10ps;
+
   assign zero = (result == 0);
 
   always_comb begin

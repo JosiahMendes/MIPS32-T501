@@ -36,7 +36,7 @@ module mips_cpu_registers
             $display("Registers reset");
         end else if (write && wrAddr == 0) begin // do nothing if attempt to write to 0 register
         end else if(write) begin
-            $display("Register %d being written to with data %h",wrAddr,wrData);
+            //$display("Register %d being written to with data %h",wrAddr,wrData);
             Register[wrAddr] <= wrData; //write data to specified register.
         end
     end

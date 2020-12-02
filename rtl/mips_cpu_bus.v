@@ -36,6 +36,9 @@ module cpu_bus(
     wire [4:0]  I_instr_rt          = instr[20:16];
     wire [15:0] I_instr_immediate   = instr[15:0];
 
+    logic [31:0] exImmediate;
+    assign exImmediate = {{16{I_instr_immediate[15]}}, I_instr_immediate};
+
     // J-format instruction sub-sections
     wire [25:0]  J_instr_addr        = instr[25:0];
 
@@ -43,7 +46,8 @@ module cpu_bus(
     typedef enum logic[8-1:0] {
         OPCODE_ADDIU = 8'b001001,
         OPCODE_JR = 8'b000000,
-        OPCODE_LW = 8'b100011
+        OPCODE_LW = 8'b100011,
+        OPCODE_SW = 8'b101011
         // ... rest added here
     } opcode_t;
 
@@ -71,20 +75,26 @@ module cpu_bus(
     logic [4:0]  regDest,     regRdA,     regRdB;
     logic [31:0] regDestData, regRdDataA, regRdDataB;
 
+    logic regDestDataSel;
+
     //ALU Connections
     logic [3:0] ALUop;
     logic [31:0] ALUInA, ALUInB, ALUOut;
     logic ALUZero;
+    logic ALUSrc;
+    assign ALUSrc = (instr_opcode == OPCODE_ADDIU) ? 1:0;
 
-    //reg [31:0] ALUTemp;
+    //Sign Extender
+    logic [15:0] unextended;
+    logic [31:0] extended;
+
 
     //Memory Control
     assign address = (state == INSTR_FETCH) ? PC : ALUOut;
-    assign read = (state==INSTR_FETCH) ? 1 :0;
-    assign byteenable = 4'b1111;
-    assign write = 0;
-
- 
+    assign read = (state==INSTR_FETCH || (state == MEM && instr_opcode == OPCODE_LW)) ? 1 :0;
+    assign byteenable = 4'b1111;//TODO Temp
+    assign write = (state == MEM && instr_opcode == OPCODE_SW) ? 1 :0; //TODO Temp
+    assign regDestDataSel = (instr_opcode == OPCODE_LW) ? 1 :0;
 
     
     // This is the simple state machine. The state switching is just drafted, and will depend on the individual instructions
@@ -97,38 +107,43 @@ module cpu_bus(
             active<=1;
         end
         if (state==INSTR_FETCH) begin
-            $display("CPU 1, fetching instruction @ %h",address);
+            $display("-------------------------------------------------------------------------------------------------------------PC = %h",PC);
+            $display("CPU-FETCH,      Fetching instruction @ %h",address);
             state <= INSTR_DECODE;
             if(address == 32'hbfc00004) begin active <= 0; end
             regReset <= 0;
-
+            regWriteEn<=0;
         end
         if (state==INSTR_DECODE) begin
-            $display("CPU 2 input= %h, reading from reg %h", readdata, I_instr_rs);
+            $display("                                              CPU: Register $v0 contains  %h",register_v0);
+            $display("CPU-DECODE      Instruction Fetched is %h,    reading from registers %d and %d ", readdata, readdata[25:21], readdata[20:16] );
             state <= EXEC;
             regRdA <= readdata[25:21];
-            regRdB<=0;
+            regRdB <= readdata[20:16];
             instr <= readdata;
-            
+            //Done
         end
         if (state==EXEC) begin
-            $display("CPU 3, regA out=%h, regB out = %h", regRdDataA, regRdDataB);
+            $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate);
             state <= MEM;
-            ALUop <= 4'd2;
             ALUInA <= regRdDataA;
-            ALUInB <= I_instr_immediate[15] ? {16'hFFFF, I_instr_immediate} : {16'h0000,I_instr_immediate};
-            PC<=PC_increment;
+            ALUInB <= (ALUSrc) ? {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
+            //Add case statements
+            ALUop <= 4'd2;
         end
         if (state==MEM) begin
-            $display("CPU 4 ALUa = %h, ALUb= %h, instr_im =%h, ALUOut = %h, lol",ALUInA, ALUInB, I_instr_immediate, ALUOut);
+            $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d",ALUOut, regRdDataB,write, read );
             state <= WRITE_BACK;
+            //Done
         end
         if (state==WRITE_BACK) begin
-            $display("CPU 5 ALUOut = %h, rs = %d, trying to write to %d" ,ALUOut, I_instr_rt,regDest);
+            $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d..." ,readdata, ALUOut, I_instr_rt);
             state <= INSTR_FETCH;
             regDest <= I_instr_rt;
-            regDestData<=ALUOut;
+            regDestData<= (regDestDataSel) ? readdata : ALUOut;
             regWriteEn<=1;
+            PC<=PC_increment;
+            //Done
         end
     end
 
