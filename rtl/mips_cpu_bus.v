@@ -43,27 +43,35 @@ module cpu_bus(
     wire [25:0]  J_instr_addr        = instr[25:0];
 
     // Instruction opcode is enumerated
-    typedef enum logic[8-1:0] {
+    typedef enum logic[7:0] {
         OPCODE_ADDIU = 8'b001001,
-        OPCODE_JR = 8'b000000,
-        OPCODE_LW = 8'b100011,
-        OPCODE_SW = 8'b101011
+        OPCODE_R    = 8'b000000,
+        OPCODE_LW    = 8'b100011,
+        OPCODE_SW    = 8'b101011
         // ... rest added here
     } opcode_t;
+
+    typedef enum logic[7:0] {
+        FUNC_JR = 8'b001000,
+        FUNC_SLL = 8'b00000
+        // ... rest added here
+    } func_t;
 
     typedef enum logic[2:0] {
         INSTR_FETCH = 3'b000,
         INSTR_DECODE = 3'b001,
         EXEC         = 3'b010,
         MEM          = 3'b011,
-        WRITE_BACK   = 3'b100
+        WRITE_BACK   = 3'b100,
+        HALTED       = 3'b111
     } state_t;
 
     // Statemachine -> MIPS uses a maximum of 5 states. Starting off with decimal state indexes (0-4)
     logic [2:0] state;
+    logic active_next = 1;
 
     //PC
-    logic [31:0] PC, PC_increment;
+    logic [31:0] PC, PC_increment, PC_temp;
     assign PC_increment = PC+4;
 
     //HI LO
@@ -78,7 +86,7 @@ module cpu_bus(
     logic regDestDataSel;
 
     //ALU Connections
-    logic [3:0] ALUop;
+    logic [4:0] ALUop;
     logic [31:0] ALUInA, ALUInB, ALUOut;
     logic ALUZero;
     logic ALUSrc;
@@ -96,6 +104,9 @@ module cpu_bus(
     assign write = (state == MEM && instr_opcode == OPCODE_SW) ? 1 :0; //TODO Temp
     assign regDestDataSel = (instr_opcode == OPCODE_LW) ? 1 :0;
 
+    //Branch Delay Slot Handling
+    logic [2:0] branch;
+
     
     // This is the simple state machine. The state switching is just drafted, and will depend on the individual instructions
     always @(posedge clk) begin
@@ -105,12 +116,15 @@ module cpu_bus(
             regReset <= 1;
             PC <= 32'hBFC00000;
             active<=1;
+            branch <=0;
         end
         if (state==INSTR_FETCH) begin
             $display("-------------------------------------------------------------------------------------------------------------PC = %h",PC);
-            $display("CPU-FETCH,      Fetching instruction @ %h",address);
-            state <= INSTR_DECODE;
-            if(address == 32'hbfc00004) begin active <= 0; end
+            $display("CPU-FETCH,      Fetching instruction @ %h     branch status is ",address, branch);
+            //state<=INSTR_DECODE;
+            if(address == 32'h00000000) begin 
+                active <= 0; state<=HALTED;
+            end else begin state<=INSTR_DECODE; end
             regReset <= 0;
             regWriteEn<=0;
         end
@@ -124,12 +138,32 @@ module cpu_bus(
             //Done
         end
         if (state==EXEC) begin
-            $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate);
+            $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h      shiftamount", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate,R_instr_shamt);
             state <= MEM;
             ALUInA <= regRdDataA;
             ALUInB <= (ALUSrc) ? {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
-            //Add case statements
-            ALUop <= 4'd2;
+            case (instr_opcode)//Add case statements
+                OPCODE_ADDIU: begin
+                    ALUop <= 5'd2;
+                end
+                OPCODE_LW: begin
+                    ALUop <= 5'd2;
+                end
+                OPCODE_SW: begin
+                    ALUop <= 5'd2;
+                end
+                OPCODE_R: begin
+                    case(R_instr_func)
+                        FUNC_JR: begin
+                            branch <= 1;
+                            PC_temp<=regRdDataA;
+                        end
+                        FUNC_SLL:begin
+                            ALUop<=5'd6;
+                        end
+                    endcase
+                end
+            endcase
         end
         if (state==MEM) begin
             $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d",ALUOut, regRdDataB,write, read );
@@ -140,10 +174,22 @@ module cpu_bus(
             $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d..." ,readdata, ALUOut, I_instr_rt);
             state <= INSTR_FETCH;
             regDest <= I_instr_rt;
-            regDestData<= (regDestDataSel) ? readdata : ALUOut;
+            regDestData <= (regDestDataSel) ? readdata : ALUOut;
             regWriteEn<=1;
-            PC<=PC_increment;
+            if (branch == 1) begin
+                branch <=2;
+                PC <= PC_increment;
+            end else if (branch == 2)begin
+                branch <= 0;
+                PC<= PC_temp;
+            end else begin
+                branch <= 0;
+                PC <= PC_increment;
+            end 
             //Done
+        end
+        if(state == HALTED)begin
+            $display("CPU HALTED");
         end
     end
 
@@ -156,7 +202,7 @@ module cpu_bus(
     );
     mips_cpu_ALU ALUInst(
         .op(ALUop), .a(ALUInA), .b(ALUInB),
-        .result(ALUOut), .zero(ALUZero)
+        .result(ALUOut), .zero(ALUZero), .sa(R_instr_shamt)
     );
 
 endmodule
