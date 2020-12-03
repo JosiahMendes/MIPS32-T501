@@ -16,11 +16,13 @@ unordered_map<string,string> immDefine();
 unordered_map<string,string> jumDefine();
 string regTrans(string str, int lineNum);
 bool is_number(const string& s);
+string to_hex(string str);
 
 
 int main(int argc, char**argv){
     string infilename;
-    unsigned long memorySize;
+    bool littleEndian;
+    bool hex;
     int lineNum = 0;
 
     unordered_map<string,string> registerMap = regDefine();
@@ -29,13 +31,20 @@ int main(int argc, char**argv){
 
     
     if(argc == 1){
-        cout<< "No file & Memory defined";
+        cout << "No file defined";
         exit(EXIT_FAILURE);
-    } else if (argc == 2){
-        cout<< "File or memory size undefined";
-    } else if(argc >= 3 && is_number(argv[2])){
+    } else if(argc == 2) {
         infilename = argv[1];
-        memorySize = stol(argv[2]);
+        hex = true;
+        littleEndian = false;
+    } else if(argc == 3){
+        infilename = argv[1];
+        if(strcmp((const char (*))argv[2], "bin") == 0){hex = false;} else{hex = true;}
+        littleEndian = false;
+    } else if (argc == 4){
+        infilename = argv[1];
+        if(strcmp((const char (*))argv[2], "bin") == 0){hex = false;} else{hex = true;}
+        if(strcmp((const char (*))argv[3], "littleEndian") == 0){littleEndian = true;} else{littleEndian = false;}
     }
 
     ifstream inputfile(infilename);
@@ -108,16 +117,24 @@ int main(int argc, char**argv){
                 cout << "Invalid Instruction at line " << lineNum << endl;
                 exit(EXIT_FAILURE);
             }
-            bitset<32> set(binTrans);  
-            cout << setfill('0');
-            cout << hex << setw(8) << set.to_ulong() << endl;
-            cout << binTrans <<endl;
 
-
+            string hexTrans = to_hex(binTrans.substr(0,4))+to_hex(binTrans.substr(4,4))+" "+to_hex(binTrans.substr(8,4))+to_hex(binTrans.substr(12,4))+" "+to_hex(binTrans.substr(16,4))+to_hex(binTrans.substr(20,4))+" "+to_hex(binTrans.substr(24,4))+to_hex(binTrans.substr(28,4));
+            //cout << hexTrans << endl;
+            string littleEndianTrans = hexTrans.substr(9,2)+" "+hexTrans.substr(6,2)+" "+hexTrans.substr(3,2)+" "+hexTrans.substr(0,2);
+            
+            if(littleEndian){
+                cout<<littleEndianTrans<<endl;
+            }else if(!hex){
+                cout << binTrans <<endl;
+            }else {
+                cout << hexTrans <<endl;
+            }
+            
         }
-    } else cout <<"Unable to open file";
-
-
+    } else {
+        cout <<"Unable to open file";
+        exit(EXIT_FAILURE);
+    }
 }
 
 vector<string> wordseperator(string str)
@@ -151,6 +168,27 @@ string regTrans(string str, int lineNum){
             return bitset<5>(reg).to_string();
         }
     }
+}
+
+string to_hex(string str){
+    if(str == "0000"){return "0";}
+    else if(str == "0001"){return "1";}
+    else if(str == "0010"){return "2";}
+    else if(str == "0011"){return "3";}
+    else if(str == "0100"){return "4";}
+    else if(str == "0101"){return "5";}
+    else if(str == "0110"){return "6";}
+    else if(str == "0111"){return "7";}
+    else if(str == "1000"){return "8";}
+    else if(str == "1001"){return "9";}
+    else if(str == "1010"){return "a";}
+    else if(str == "1011"){return "b";}
+    else if(str == "1100"){return "c";}
+    else if(str == "1101"){return "d";}
+    else if(str == "1110"){return "e";}
+    else if(str == "1111"){return "f";}
+    else {cout <<"Not binary!"<<endl; exit(EXIT_FAILURE);}
+
 }
 
 unordered_map<string,string> regDefine(){
