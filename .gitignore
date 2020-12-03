@@ -19,3 +19,4 @@
 
 #Ignore vcds
 *.vcd
+.vscode/settings.json
