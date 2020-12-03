@@ -152,6 +152,7 @@ module cpu_bus(
                 end
                 OPCODE_SW: begin
                     ALUop <= 5'd2;
+                    //just checking if my setup works ~M
                 end
                 OPCODE_R: begin
                     case(R_instr_func)
