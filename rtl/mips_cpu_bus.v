@@ -90,7 +90,7 @@ module cpu_bus(
     logic [31:0] ALUInA, ALUInB, ALUOut;
     logic ALUZero;
     logic ALUSrc;
-    assign ALUSrc = (instr_opcode == OPCODE_ADDIU) ? 1:0;
+    assign ALUSrc = (instr_opcode == OPCODE_ADDIU || instr_opcode == OPCODE_LW || instr_opcode == OPCODE_SW) ? 1:0;
 
     //Sign Extender
     logic [15:0] unextended;
@@ -103,6 +103,7 @@ module cpu_bus(
     assign byteenable = 4'b1111;//TODO Temp
     assign write = (state == MEM && instr_opcode == OPCODE_SW) ? 1 :0; //TODO Temp
     assign regDestDataSel = (instr_opcode == OPCODE_LW) ? 1 :0;
+    assign writedata = regRdDataB;
 
     //Branch Delay Slot Handling
     logic [2:0] branch;

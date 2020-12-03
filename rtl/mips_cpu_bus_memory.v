@@ -33,8 +33,9 @@ module mips_cpu_bus_memory
         // memory[3] = 8'h25;
     end
 
-    always_ff @(posedge clk) begin
+    always @(posedge clk) begin
         if(write && !read) begin
+            $display("Writing %h to Memory", writedata);
             case(byteenable)
                 4'b1111: begin
                     memory[addr]<=writedata[7:0];
