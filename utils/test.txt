@@ -1,6 +1,6 @@
 addiu $0 $2 25		
-lw $3 $2 9		
+lw $3 9 $2		
 addu $4 $2 $3	
 subu $5 $2 $3	
-sw $5 $1 10	
+sw $5 10($1)	#testhkhkhk
 j 123455

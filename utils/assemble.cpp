@@ -57,7 +57,10 @@ int main(int argc, char**argv){
         while(getline(inputfile,instr)){
             lineNum++;
             string binTrans;
+            replace(instr.begin(), instr.end(), '(', ' ');
+            replace(instr.begin(), instr.end(), ')', ' ');
             vector<string> line = wordseperator(instr);
+            if (line.size()>4){line.resize(4);}
             if(registerMap.find(line[0])!=registerMap.end()){
                 binTrans = "000000";
                 if(line[0] == "jr"){
@@ -101,9 +104,15 @@ int main(int argc, char**argv){
                 }else if(line[0] == "bgezal"){
                     if (line.size()!=3){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
                     binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + "10001" + bitset<16>(stol(line[2],nullptr,16)).to_string();
-                }else{
+                }else if(line[0] == "bne" || line[0] == "beq"){
                     if (line.size()!=4){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
                     binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + regTrans(line[2],lineNum) + bitset<16>(stol(line[3],nullptr,16)).to_string();
+                } else if (line[0] == "addiu" || line[0] == "andiu" ||line[0] == "ori" ||line[0] == "xori"||line[0] == "slti"||line[0] == "sltiu"){
+                    if (line.size()!=4){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[2],lineNum) + regTrans(line[1],lineNum) + bitset<16>(stol(line[3],nullptr,16)).to_string();
+                } else{
+                    if (line.size()!=4){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[3],lineNum) + regTrans(line[1],lineNum) + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }
             }else if(jumpMap.find(line[0]) != jumpMap.end()){
                 if(line[0] == "j"){
