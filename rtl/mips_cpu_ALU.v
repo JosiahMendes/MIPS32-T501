@@ -23,6 +23,7 @@ module mips_cpu_ALU (
       7: begin result = b >> sa; end //shift right
       8: begin result = b >>> sa; end //arithmetic shift right
 
+
     endcase
   end
 
