@@ -13,7 +13,7 @@ module mips_cpu_ALU (
   logic signed [31:0] sra_var;
 
   assign zero = (result == 0);
-  assign sav = (op==9 || op==10 || op==11) ? b[4:0] : 0;
+  assign sav = (op==9 || op==10 || op==11) ? a[4:0] : 0;
   assign sra_var = b;
 
 
@@ -28,8 +28,8 @@ module mips_cpu_ALU (
       6: begin result = b << sa; end//shift left
       7: begin result = b >> sa; end //shift right
       8: begin result = sra_var >>> sa; end //arithmetic shift right
-      9: begin result = a << sav; end //shift left variable
-      10: begin result = a >> sav; end //shift right variable
+      9: begin result = b << sav; end //shift left variable
+      10: begin result = b >> sav; end //shift right variable
       11: begin result = sra_var >>> sav; end //arithmetic shift right variable
 
     endcase
