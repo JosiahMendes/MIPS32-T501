@@ -25,12 +25,7 @@ module mips_cpu_bus_memory
         if (RAM_INIT_FILE != "") begin
             $display("RAM : INIT : Loading RAM contents from %s", RAM_INIT_FILE);
             $readmemh(RAM_INIT_FILE, memory);
-            $display("RAM: first word is %h %h %h %h",memory[0],memory[1],memory[2],memory[3]);
         end
-        // memory[0] = 8'h0f;
-        // memory[1] = 8'h00;
-        // memory[2] = 8'h02;
-        // memory[3] = 8'h25;
     end
 
     always_ff @(posedge clk) begin

@@ -7,23 +7,30 @@
 #include <cctype>
 #include<cstdlib>
 #include <bitset>
+#include <map>
 
 using namespace std;
 
 vector<string> wordseperator(string str);
+
 unordered_map<string,string> regDefine();
 unordered_map<string,string> immDefine();
 unordered_map<string,string> jumDefine();
 string regTrans(string str, int lineNum);
+
 bool is_number(const string& s);
 string to_hex(string str);
+
+void invalidInstruction(int lineNum);
 
 
 int main(int argc, char**argv){
     string infilename;
     bool littleEndian;
     bool hex;
+    bool writeZeros;
     int lineNum = 0;
+    long memSize = 16777216;
 
     unordered_map<string,string> registerMap = regDefine();
     unordered_map<string,string> immediateMap = immDefine();
@@ -31,20 +38,28 @@ int main(int argc, char**argv){
 
     
     if(argc == 1){
-        cout << "No file defined";
+        cerr << "No file defined";
         exit(EXIT_FAILURE);
     } else if(argc == 2) {
         infilename = argv[1];
         hex = true;
         littleEndian = false;
+        writeZeros = false;
     } else if(argc == 3){
         infilename = argv[1];
         if(strcmp((const char (*))argv[2], "bin") == 0){hex = false;} else{hex = true;}
         littleEndian = false;
+        writeZeros = false;
     } else if (argc == 4){
         infilename = argv[1];
         if(strcmp((const char (*))argv[2], "bin") == 0){hex = false;} else{hex = true;}
         if(strcmp((const char (*))argv[3], "littleEndian") == 0){littleEndian = true;} else{littleEndian = false;}
+        writeZeros = false;
+    }else if(argc > 4){
+        infilename = argv[1];
+        if(strcmp((const char (*))argv[2], "bin") == 0){hex = false;} else{hex = true;}
+        if(strcmp((const char (*))argv[3], "littleEndian") == 0){littleEndian = true;} else{littleEndian = false;}
+        writeZeros = true;
     }
 
     ifstream inputfile(infilename);
@@ -53,8 +68,13 @@ int main(int argc, char**argv){
         string outfilename = "RAM_INIT"+infilename;
         ofstream outputfile(outfilename);
 
+
+        //Assembling instructions
         string instr;
         while(getline(inputfile,instr)){
+            if(instr == "data:"){
+                break;
+            }
             lineNum++;
             string binTrans;
             replace(instr.begin(), instr.end(), '(', ' ');
@@ -64,66 +84,66 @@ int main(int argc, char**argv){
             if(registerMap.find(line[0])!=registerMap.end()){
                 binTrans = "000000";
                 if(line[0] == "jr"){
-                    if (line.size()!=2){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=2){invalidInstruction(lineNum);}
                     binTrans = binTrans + regTrans(line[1],lineNum)+ bitset<15>(0).to_string() + registerMap.at(line[0]);
                 }else if(line[0] == "mfhi" ||line[0] == "mflo"){
-                    if (line.size()!=2){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=2){invalidInstruction(lineNum);}
                     binTrans = binTrans + bitset<10>(0).to_string()+ regTrans(line[1],lineNum)+ bitset<5>(0).to_string() + registerMap.at(line[0]);
                 }else if(line[0] == "mthi" ||line[0] == "mtlo" || line[0] == "mthi" ||line[0] == "mtlo"){
-                    if (line.size()!=2){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=2){invalidInstruction(lineNum);}
                     binTrans = binTrans + regTrans(line[1],lineNum)+ bitset<15>(0).to_string() + registerMap.at(line[0]);
                 }else if(line[0] == "jalr"){
-                    if (line.size()!=3){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=3){invalidInstruction(lineNum);}
                     binTrans = binTrans + regTrans(line[1],lineNum) + bitset<5>(0).to_string() + regTrans(line[2],lineNum)+ bitset<5>(0).to_string() + registerMap.at(line[0]);
                 }else if (line[0] == "mult" ||line[0] == "multu" || line[0] == "div" ||line[0] == "divu"){
-                    if (line.size()!=3){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=3){invalidInstruction(lineNum);}
                     binTrans = binTrans + regTrans(line[1],lineNum) + regTrans(line[2],lineNum) + bitset<10>(0).to_string()+registerMap.at(line[0]);
                 }else if(line[0] == "sll" || line[0] =="srl" || line[0] == "sra"){
-                    if (line.size()!=4){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=4){invalidInstruction(lineNum);}
                     binTrans = binTrans + bitset<5>(0).to_string() + regTrans(line[1],lineNum) + regTrans(line[2],lineNum) + bitset<5>(stol(line[3])).to_string()+ registerMap.at(line[0]);
                 }else if (line[0] == "sllv" || line[0] =="slrv"){
-                    if (line.size()!=4){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=4){invalidInstruction(lineNum);}
                     binTrans = binTrans + regTrans(line[3],lineNum) + regTrans(line[2],lineNum)+ regTrans(line[1],lineNum) + bitset<5>(0).to_string() + registerMap.at(line[0]);
                 }else{
-                    if (line.size()!=4){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=4){invalidInstruction(lineNum);}
                     binTrans = binTrans + regTrans(line[2],lineNum) + regTrans(line[3],lineNum)+ regTrans(line[1],lineNum) + bitset<5>(0).to_string() + registerMap.at(line[0]);
                 }
             }else if(immediateMap.find(line[0]) != immediateMap.end()){
                 if(line[0] == "lui"){
-                    if (line.size()!=3){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=3){invalidInstruction(lineNum);}
                     binTrans = immediateMap.at(line[0]) + "00000" + regTrans(line[1],lineNum) + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }else if(line[0] == "bltz" || line[0] == "blez" || line[0] == "bgtz"){
-                    if (line.size()!=3){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=3){invalidInstruction(lineNum);}
                     binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + "00000" + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }else if(line[0] == "bgez"){
-                    if (line.size()!=3){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=3){invalidInstruction(lineNum);}
                     binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + "00001" + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }else if(line[0] == "bltzal"){
-                    if (line.size()!=3){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=3){invalidInstruction(lineNum);}
                     binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + "10000" + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }else if(line[0] == "bgezal"){
-                    if (line.size()!=3){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=3){invalidInstruction(lineNum);}
                     binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + "10001" + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }else if(line[0] == "bne" || line[0] == "beq"){
-                    if (line.size()!=4){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=4){invalidInstruction(lineNum);}
                     binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + regTrans(line[2],lineNum) + bitset<16>(stol(line[3],nullptr,16)).to_string();
                 } else if (line[0] == "addiu" || line[0] == "andiu" ||line[0] == "ori" ||line[0] == "xori"||line[0] == "slti"||line[0] == "sltiu"){
-                    if (line.size()!=4){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=4){invalidInstruction(lineNum);}
                     binTrans = immediateMap.at(line[0]) + regTrans(line[2],lineNum) + regTrans(line[1],lineNum) + bitset<16>(stol(line[3],nullptr,16)).to_string();
                 } else{
-                    if (line.size()!=4){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=4){invalidInstruction(lineNum);}
                     binTrans = immediateMap.at(line[0]) + regTrans(line[3],lineNum) + regTrans(line[1],lineNum) + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }
             }else if(jumpMap.find(line[0]) != jumpMap.end()){
                 if(line[0] == "j"){
-                    if (line.size()!=2){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=2){invalidInstruction(lineNum);}
                     binTrans = jumpMap.at(line[0]) + bitset<26>(stol(line[1],nullptr,16)).to_string();
                 } else if (line[0] == "jal"){
-                    if (line.size()!=2){cout << "Invalid Instruction at line " << lineNum << endl; exit(EXIT_FAILURE);}
+                    if (line.size()!=2){invalidInstruction(lineNum);}
                     binTrans = jumpMap.at(line[0]) + bitset<26>(stol(line[1],nullptr,16)).to_string();
                 }
             } else{
-                cout << "Invalid Instruction at line " << lineNum << endl;
+                invalidInstruction(lineNum);
                 exit(EXIT_FAILURE);
             }
 
@@ -137,14 +157,63 @@ int main(int argc, char**argv){
                 cout << binTrans <<endl;
             }else {
                 cout << hexTrans <<endl;
-            }
-            
+            }    
         }
+
+        //Writing additional data and zeros to memory
+        string data;
+        map<long, string> memoryaddress;
+        long resetVector = stol("BFC00000",nullptr,16);
+        while(getline(inputfile,data) && writeZeros){
+            if(data.empty()){
+                break;
+            }
+            replace(data.begin(), data.end(), ':', ' ');
+            vector<string> line = wordseperator(data);
+            if (line.size()>4){line.resize(4);}
+
+            if((stol(line[0],nullptr,16)-resetVector) > memSize){
+                cerr << "Data Address too large" <<endl;
+                exit(EXIT_FAILURE);
+            }else if ((stol(line[0],nullptr,16) < (lineNum * 4+resetVector)) && (stol(line[0],nullptr,16) > resetVector)){
+                cerr <<"Data overwrites address" <<endl;
+                exit(EXIT_FAILURE);
+            }else if ((stol(line[0],nullptr,16) < resetVector)){
+                cerr <<"Data not accessible" <<endl;
+                exit(EXIT_FAILURE);
+            }else if (stoi(line[1],nullptr,16)>255){
+                cerr<<"Data being stored is too large"<<endl;
+                exit(EXIT_FAILURE);
+            }else if(line[1].size()!=2){
+                cerr<<"Data size is incorrect, needs to be 2 bits"<<endl;
+                exit(EXIT_FAILURE);
+            }else if(line[0].size()!=8){
+                cerr<<"Address size is incorrect, needs to be 8 bits"<<endl;
+                exit(EXIT_FAILURE);
+            }else if(memoryaddress.find(stol(line[0],nullptr,16)) != memoryaddress.end()){
+                cerr<<"Memory address written to twice"<<endl;
+                exit(EXIT_FAILURE);
+            }else {
+                memoryaddress.insert(pair<long,string>(stol(line[0],nullptr,16),line[1]));
+            }       
+        }
+        if(writeZeros){
+            for (long i = (lineNum*4)+resetVector; i < memSize+resetVector; i++){
+                if(memoryaddress.find(i) == memoryaddress.end()){
+                    cout << "00 ";
+                }else{
+                    cout << memoryaddress.at(i) + " ";
+            }
+            }
+        }
+
     } else {
-        cout <<"Unable to open file";
+        cerr <<"Unable to open file";
         exit(EXIT_FAILURE);
     }
+    exit(EXIT_SUCCESS);
 }
+
 
 vector<string> wordseperator(string str)
 {
@@ -158,20 +227,25 @@ vector<string> wordseperator(string str)
     istream_iterator<string> begin(ss);
     istream_iterator<std::string> end;
     vector<string> vstrings(begin, end);
-    //copy(vstrings.begin(), vstrings.end(), ostream_iterator<string>(std::cout, "\n"));
+    //copy(vstrings.begin(), vstrings.end(), ostream_iterator<string>(std::cerr, "\n"));
     return vstrings;
+}
+
+void invalidInstruction(int lineNum){
+    cerr << "Invalid Instruction at line " << lineNum << endl; 
+    exit(EXIT_FAILURE);
 }
 
 string regTrans(string str, int lineNum){
     int reg;
     if (str[0] != '$'){
-        cout << "Register " << str << " at line "<< lineNum << " is invalid" <<endl;
+        cerr << "Register " << str << " at line "<< lineNum << " is invalid" <<endl;
         exit(EXIT_FAILURE);
     } else {
         str.erase(str.begin());
         reg = stoi(str);
         if(reg > 31){
-            cout << "Register " << str << " at line "<< lineNum << " is invalid" <<endl;
+            cerr << "Register " << str << " at line "<< lineNum << " is invalid" <<endl;
             exit(EXIT_FAILURE);
         } else {
             return bitset<5>(reg).to_string();
@@ -196,7 +270,7 @@ string to_hex(string str){
     else if(str == "1101"){return "d";}
     else if(str == "1110"){return "e";}
     else if(str == "1111"){return "f";}
-    else {cout <<"Not binary!"<<endl; exit(EXIT_FAILURE);}
+    else {cerr <<"Not binary!"<<endl; exit(EXIT_FAILURE);}
 
 }
 
