@@ -31,6 +31,7 @@ if test -d "test/testcases/${INSTR}" ; then
         if [[ "${RESULT}" -ne 0 ]] ; then
             echo "${TESTNAME} ${INSTR} Fail"
             rm test/testcases/${INSTR}/${TESTNAME}.stdout
+            rm test/testcases/${INSTR}/${TESTNAME}
             exit
         fi
 
@@ -56,6 +57,8 @@ if test -d "test/testcases/${INSTR}" ; then
         else
             echo "${TESTNAME} ${INSTR} Pass"
         fi
+        rm test/testcases/${INSTR}/${TESTNAME}
+        rm test/testcases/${INSTR}/${TESTNAME}.out
     done
 else
     >&2 echo "Invalid instruction"
