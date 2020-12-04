@@ -20,3 +20,5 @@
 #Ignore vcds
 *.vcd
 .vscode/settings.json
+a.out
+a.out

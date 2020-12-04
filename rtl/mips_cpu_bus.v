@@ -45,16 +45,65 @@ module cpu_bus(
     // Instruction opcode is enumerated
     typedef enum logic[7:0] {
         OPCODE_ADDIU = 8'b001001,
-        OPCODE_R    = 8'b000000,
-        OPCODE_LW    = 8'b100011,
-        OPCODE_SW    = 8'b101011
-        // ... rest added here
+        OPCODE_ANDI  = 8'b001100,
+
+        OPCODE_BEQ    = 8'b000100,
+        //OPCODE_BGEZ   = 8'b000001,
+        //OPCODE_BGEZAL = 8'b000001,
+        OPCODE_BLEZ   = 8'b000110,
+        //OPCODE_BLTZ   = 8'b000001,
+        //OPCODE_BLTZAL = 8'b000001,
+        OPCODE_BNE    = 8'b000101,
+        OPCODE_LB     = 8'b100000,
+        OPCODE_LBU    = 8'b100100,
+        OPCODE_LHU    = 8'b100101,
+        OPCODE_LUI    = 8'b001111,
+        OPCODE_LW     = 8'b100011,
+        OPCODE_LWL    = 8'b100010,
+        OPCODE_LWR    = 8'b100110,
+        OPCODE_ORI    = 8'b001101,
+        OPCODE_SB     = 8'b101000,
+        OPCODE_SH     = 8'b101001,
+        OPCODE_SLTI   = 8'b001010,
+        OPCODE_SW     = 8'b101011,
+        OPCODE_XORI   = 8'b001110,
+
+        OPCODE_J      = 8'b000010,
+        OPCODE_JAL    = 8'b000011,
+
+        OPCODE_R    = 8'b000000
+
     } opcode_t;
 
     typedef enum logic[7:0] {
         FUNC_JR = 8'b001000,
-        FUNC_SLL = 8'b00000
-        // ... rest added here
+        FUNC_JALR = 8'b001001,
+
+        FUNC_ADDU = 8'b100001,
+        FUNC_SUBU = 8'b100011,
+        FUNC_XOR  = 8'b100110,
+        FUNC_AND  = 8'b100100,
+        FUNC_OR   = 8'b100101,
+
+        FUNC_DIV  = 8'b011010,
+        FUNC_DIVU = 8'b011011,
+        FUNC_MULT = 8'b011000,
+        FUNC_MULTU= 8'b011001,
+
+        FUNC_MFHI = 8'b010000,
+        FUNC_MFLO = 8'b010010,
+        FUNC_MTHI = 8'b010001,
+        FUNC_MTLO = 8'b010011,
+
+        FUNC_SLL  = 8'b000000,
+        FUNC_SLLV = 8'b000100,
+        FUNC_SLT  = 8'b101010,
+        FUNC_SLTU = 8'b101011,
+        FUNC_SRA  = 8'b000011,
+        FUNC_SRAV = 8'b000111,
+        FUNC_SRL  = 8'b000010,
+        FUNC_SRLV = 8'b000110
+
     } func_t;
 
     typedef enum logic[2:0] {
@@ -65,6 +114,18 @@ module cpu_bus(
         WRITE_BACK   = 3'b100,
         HALTED       = 3'b111
     } state_t;
+
+    typedef enum logic[4:0]{
+        ALU_AND = 5'd0,
+        ALU_OR = 5'd1,
+        ALU_ADD = 5'd2,
+        ALU_SUB = 5'd3,
+        ALU_SLT = 5'd4,
+        ALU_XOR = 5'd5,
+        ALU_SLL = 5'd6,
+        ALU_SRL = 5'd7,
+        ALU_SRA = 5'd8
+    }aluop_t;
 
     // Statemachine -> MIPS uses a maximum of 5 states. Starting off with decimal state indexes (0-4)
     logic [2:0] state;
@@ -90,7 +151,7 @@ module cpu_bus(
     logic [31:0] ALUInA, ALUInB, ALUOut;
     logic ALUZero;
     logic ALUSrc;
-    assign ALUSrc = (instr_opcode == OPCODE_ADDIU) ? 1:0;
+    assign ALUSrc = (instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL) ? 0:1;
 
     //Sign Extender
     logic [15:0] unextended;
@@ -103,11 +164,12 @@ module cpu_bus(
     assign byteenable = 4'b1111;//TODO Temp
     assign write = (state == MEM && instr_opcode == OPCODE_SW) ? 1 :0; //TODO Temp
     assign regDestDataSel = (instr_opcode == OPCODE_LW) ? 1 :0;
+    assign writedata = regRdDataB;
 
     //Branch Delay Slot Handling
     logic [2:0] branch;
 
-    
+
     // This is the simple state machine. The state switching is just drafted, and will depend on the individual instructions
     always @(posedge clk) begin
         if (rst) begin
@@ -122,7 +184,7 @@ module cpu_bus(
             $display("-------------------------------------------------------------------------------------------------------------PC = %h",PC);
             $display("CPU-FETCH,      Fetching instruction @ %h     branch status is ",address, branch);
             //state<=INSTR_DECODE;
-            if(address == 32'h00000000) begin 
+            if(address == 32'h00000000) begin
                 active <= 0; state<=HALTED;
             end else begin state<=INSTR_DECODE; end
             regReset <= 0;
@@ -144,13 +206,13 @@ module cpu_bus(
             ALUInB <= (ALUSrc) ? {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
             case (instr_opcode)//Add case statements
                 OPCODE_ADDIU: begin
-                    ALUop <= 5'd2;
+                    ALUop <= ALU_ADD;
                 end
                 OPCODE_LW: begin
-                    ALUop <= 5'd2;
+                    ALUop <= ALU_ADD;
                 end
                 OPCODE_SW: begin
-                    ALUop <= 5'd2;
+                    ALUop <= ALU_ADD;
                 end
                 OPCODE_R: begin
                     case(R_instr_func)
@@ -159,8 +221,27 @@ module cpu_bus(
                             PC_temp<=regRdDataA;
                         end
                         FUNC_SLL:begin
-                            ALUop<=5'd6;
+                            ALUop<=ALU_SLL;
                         end
+                        FUNC_SRL: begin
+                            ALUop<=ALU_SRL;
+                        end
+                        FUNC_ADDU:begin
+                            ALUop<=ALU_ADD;
+                        end
+                        FUNC_SUBU:begin
+                            ALUop<=ALU_SUB;
+                        end
+                        FUNC_XOR:begin
+                            ALUop<=ALU_XOR;
+                        end
+                        FUNC_AND: begin
+                            ALUop <=ALU_AND;
+                        end
+                        FUNC_OR: begin
+                            ALUop <= ALU_OR;
+                        end
+
                     endcase
                 end
             endcase
@@ -185,7 +266,7 @@ module cpu_bus(
             end else begin
                 branch <= 0;
                 PC <= PC_increment;
-            end 
+            end
             //Done
         end
         if(state == HALTED)begin
