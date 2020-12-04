@@ -229,6 +229,9 @@ module mips_cpu_bus(
                         FUNC_SRL: begin
                             ALUop<=ALU_SRL;
                         end
+                        FUNC_SRA: begin
+                            ALUop<=ALU_SRA;
+                        end
                         FUNC_ADDU:begin
                             ALUop<=ALU_ADD;
                         end
