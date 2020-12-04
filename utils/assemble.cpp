@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cctype>
 #include<cstdlib>
-#include <bitset>
+#include<bitset>
 #include <map>
 
 using namespace std;
@@ -20,7 +20,12 @@ string regTrans(string str, int lineNum, unordered_map<string,int> &registerlist
 unordered_map<string,int> registers();
 
 bool is_number(const string& s);
-string to_hex(string str);
+string bin_to_hex(string str);
+string tobin26(string str);
+string tobin16(string str);
+string tobin5(string str);
+long tolong(string str);
+string tohex(string str);
 
 void invalidInstruction(int lineNum);
 
@@ -103,7 +108,7 @@ int main(int argc, char**argv){
                     binTrans = binTrans + regTrans(line[1],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist) + bitset<10>(0).to_string()+registerMap.at(line[0]);
                 }else if(line[0] == "sll" || line[0] =="srl" || line[0] == "sra"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
-                    binTrans = binTrans + bitset<5>(0).to_string() + regTrans(line[1],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist) + bitset<5>(stol(line[3])).to_string()+ registerMap.at(line[0]);
+                    binTrans = binTrans + bitset<5>(0).to_string() + regTrans(line[1],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist) + tobin5(line[3])+ registerMap.at(line[0]);
                 }else if (line[0] == "sllv" || line[0] =="slrv"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
                     binTrans = binTrans + regTrans(line[3],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist)+ regTrans(line[1],lineNum, registerlist) + bitset<5>(0).to_string() + registerMap.at(line[0]);
@@ -114,44 +119,45 @@ int main(int argc, char**argv){
             }else if(immediateMap.find(line[0]) != immediateMap.end()){
                 if(line[0] == "lui"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + "00000" + regTrans(line[1],lineNum, registerlist) + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + "00000" + regTrans(line[1],lineNum, registerlist) + tobin16(line[2]);
                 }else if(line[0] == "bltz" || line[0] == "blez" || line[0] == "bgtz"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "00000" + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "00000" + tobin16(line[2]);
                 }else if(line[0] == "bgez"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "00001" + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "00001" + tobin16(line[2]);
                 }else if(line[0] == "bltzal"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "10000" + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "10000" + tobin16(line[2]);
                 }else if(line[0] == "bgezal"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "10001" + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "10001" + tobin16(line[2]);
                 }else if(line[0] == "bne" || line[0] == "beq"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist) + bitset<16>(stol(line[3],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist) + tobin16(line[3]);
                 } else if (line[0] == "addiu" || line[0] == "andiu" ||line[0] == "ori" ||line[0] == "xori"||line[0] == "slti"||line[0] == "sltiu"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[2],lineNum, registerlist) + regTrans(line[1],lineNum, registerlist) + bitset<16>(stol(line[3],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[2],lineNum, registerlist) + regTrans(line[1],lineNum, registerlist) + tobin16(line[3]);
                 } else{
                     if (line.size()!=4){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[3],lineNum, registerlist) + regTrans(line[1],lineNum, registerlist) + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[3],lineNum, registerlist) + regTrans(line[1],lineNum, registerlist) + tobin16(line[2]);
                 }
             }else if(jumpMap.find(line[0]) != jumpMap.end()){
                 if(line[0] == "j"){
                     if (line.size()!=2){invalidInstruction(lineNum);}
-                    binTrans = jumpMap.at(line[0]) + bitset<26>(stol(line[1],nullptr,16)).to_string();
+                    binTrans = jumpMap.at(line[0]) + tobin26(line[1]);
                 } else if (line[0] == "jal"){
                     if (line.size()!=2){invalidInstruction(lineNum);}
-                    binTrans = jumpMap.at(line[0]) + bitset<26>(stol(line[1],nullptr,16)).to_string();
+                    binTrans = jumpMap.at(line[0]) + tobin26(line[1]);
                 }
             } else{
                 invalidInstruction(lineNum);
                 exit(EXIT_FAILURE);
             }
+            
+            
 
-            string hexTrans = to_hex(binTrans.substr(0,4))+to_hex(binTrans.substr(4,4))+" "+to_hex(binTrans.substr(8,4))+to_hex(binTrans.substr(12,4))+" "+to_hex(binTrans.substr(16,4))+to_hex(binTrans.substr(20,4))+" "+to_hex(binTrans.substr(24,4))+to_hex(binTrans.substr(28,4));
-            //cout << hexTrans << endl;
+            string hexTrans = bin_to_hex(binTrans.substr(0,8))+" "+bin_to_hex(binTrans.substr(8,8))+" "+bin_to_hex(binTrans.substr(16,8))+" "+bin_to_hex(binTrans.substr(24,8));
             string littleEndianTrans = hexTrans.substr(9,2)+" "+hexTrans.substr(6,2)+" "+hexTrans.substr(3,2)+" "+hexTrans.substr(0,2);
             
             if(littleEndian){
@@ -175,29 +181,23 @@ int main(int argc, char**argv){
             vector<string> line = wordseperator(data);
             if (line.size()>4){line.resize(4);}
 
-            if((stol(line[0],nullptr,16)-resetVector) > memSize){
-                cerr << "Data Address too large" <<endl;
+            if((tolong(line[0])-resetVector) > memSize){
+                cerr << "Data Address  " << line[0]<< " is too large" <<endl;
                 exit(EXIT_FAILURE);
-            }else if ((stol(line[0],nullptr,16) < (lineNum * 4+resetVector)) && (stol(line[0],nullptr,16) > resetVector)){
-                cerr <<"Data overwrites address" <<endl;
+            }else if ((tolong(line[0]) < (lineNum * 4+resetVector)) && (tolong(line[0]) > resetVector)){
+                cerr <<"Data overwrites address "<< line[0] <<endl;
                 exit(EXIT_FAILURE);
-            }else if ((stol(line[0],nullptr,16) < resetVector)){
-                cerr <<"Data not accessible" <<endl;
+            }else if ((tolong(line[0]) < resetVector)){
+                cerr <<"Data Address  " << line[0]<< " is not accessible" <<endl;
                 exit(EXIT_FAILURE);
-            }else if (stoi(line[1],nullptr,16)>255){
-                cerr<<"Data being stored is too large"<<endl;
+            }else if (tolong(line[1])>255){
+                cerr<<"Data being stored at address " << line[0]<< " is too large"<<endl;
                 exit(EXIT_FAILURE);
-            }else if(line[1].size()!=2){
-                cerr<<"Data size is incorrect, needs to be 2 bits"<<endl;
-                exit(EXIT_FAILURE);
-            }else if(line[0].size()!=8){
-                cerr<<"Address size is incorrect, needs to be 8 bits"<<endl;
-                exit(EXIT_FAILURE);
-            }else if(memoryaddress.find(stol(line[0],nullptr,16)) != memoryaddress.end()){
-                cerr<<"Memory address written to twice"<<endl;
+            }else if(memoryaddress.find(tolong(line[0])) != memoryaddress.end()){
+                cerr<<"Memory address  " << line[0]<< " is written to twice"<<endl;
                 exit(EXIT_FAILURE);
             }else {
-                memoryaddress.insert(pair<long,string>(stol(line[0],nullptr,16),line[1]));
+                memoryaddress.insert(pair<long,string>(tolong(line[0]),tohex(line[1])));
             }       
         }
         if(writeZeros){
@@ -217,7 +217,43 @@ int main(int argc, char**argv){
     exit(EXIT_SUCCESS);
 }
 
-
+string tobin26(string str){
+    if(str.substr(0,2) == "0x"){
+        return bitset<26>(stol(str.substr(2),nullptr,16)).to_string();
+    }else if(is_number(str)){
+        return bitset<26>(stol(str)).to_string();
+    }else{cerr<< "Value is not hex or dec!";exit(EXIT_FAILURE);}
+}
+string tobin16(string str){
+    if(str.substr(0,2) == "0x"){
+        return bitset<16>(stol(str.substr(2),nullptr,16)).to_string();
+    }else if(is_number(str)){
+        return bitset<16>(stol(str)).to_string();
+    }else{cerr<< "Value is not hex or dec!";exit(EXIT_FAILURE);}
+}
+string tobin5(string str){
+    if(str.substr(0,2) == "0x"){
+        return bitset<5>(stol(str.substr(2),nullptr,16)).to_string();
+    }else if(is_number(str)){
+        return bitset<5>(stol(str)).to_string();
+    }else{cerr<< "Value is not hex or dec!";exit(EXIT_FAILURE);}
+}
+long tolong(string str){
+    if(str.substr(0,2) == "0x"){
+        return stol(str.substr(2),nullptr,16);
+    }else if(is_number(str)){
+        return stol(str);
+    }else{cerr<< "Value is not hex or dec!";exit(EXIT_FAILURE);}
+}
+string tohex(string str){
+    if(str.substr(0,2) == "0x"){
+        return str.substr(2);
+    }else if(is_number(str)){
+        stringstream ss;
+        ss<<hex<<setfill('0')<<setw(2)<<stol(str);
+        return (ss.str());
+    }else{cerr<< "Value is not hex or dec!";exit(EXIT_FAILURE);}
+}
 vector<string> wordseperator(string str)
 {
     // Used to split string around spaces.
@@ -258,25 +294,11 @@ string regTrans(string str, int lineNum, unordered_map<string,int> &registerlist
     }
 }
 
-string to_hex(string str){
-    if(str == "0000"){return "0";}
-    else if(str == "0001"){return "1";}
-    else if(str == "0010"){return "2";}
-    else if(str == "0011"){return "3";}
-    else if(str == "0100"){return "4";}
-    else if(str == "0101"){return "5";}
-    else if(str == "0110"){return "6";}
-    else if(str == "0111"){return "7";}
-    else if(str == "1000"){return "8";}
-    else if(str == "1001"){return "9";}
-    else if(str == "1010"){return "a";}
-    else if(str == "1011"){return "b";}
-    else if(str == "1100"){return "c";}
-    else if(str == "1101"){return "d";}
-    else if(str == "1110"){return "e";}
-    else if(str == "1111"){return "f";}
-    else {cerr <<"Not binary!"<<endl; exit(EXIT_FAILURE);}
-
+string bin_to_hex(string str){
+    bitset<8> set(str);
+    stringstream res;
+    res << hex << uppercase <<setfill('0')<<setw(2)<< set.to_ullong();
+    return res.str();
 }
 
 unordered_map<string,string> regDefine(){
