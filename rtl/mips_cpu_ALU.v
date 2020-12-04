@@ -9,7 +9,10 @@ module mips_cpu_ALU (
 );
   timeunit 1ns / 10ps;
 
+  logic [4:0] sav;
+
   assign zero = (result == 0);
+  assign sav = (op==9 || op==10 || op==11) ? b[4:0] : 0;
 
   always_comb begin
     case (op)
@@ -22,9 +25,9 @@ module mips_cpu_ALU (
       6: begin result = b << sa; end//shift left
       7: begin result = b >> sa; end //shift right
       8: begin result = b >>> sa; end //arithmetic shift right
-      9: begin result = a << b[4:0]; end //shift left variable
-      10: begin result = a >> b[4:0]; end //shift right variable
-      11: begin result = a >>> b[4:0]; end //arithmetic shift right variable
+      9: begin result = a << sav; end //shift left variable
+      10: begin result = a >> sav; end //shift right variable
+      11: begin result = a >>> sav; end //arithmetic shift right variable
 
     endcase
   end
