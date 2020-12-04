@@ -23,7 +23,6 @@ module mips_cpu_ALU (
       7: begin result = b >> sa; end //shift right
       8: begin result = b >>> sa; end //arithmetic shift right
 
-      //will delete it ASAP, just need to check some git settings ~M
 
     endcase
   end
