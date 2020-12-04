@@ -1,4 +1,4 @@
-module cpu_bus(
+module mips_cpu_bus(
 
     input logic clk,
     input logic rst,

@@ -1,4 +1,3 @@
-`include "rtl/mips_cpu_bus.v"
 //`include "rtl/mips_cpu_bus_memory.v"
 module mips_cpu_bus_tb;
     timeunit 1ns / 10ps;
@@ -28,7 +27,7 @@ module mips_cpu_bus_tb;
         .waitrequest(waitrequest), .readdata(readdata)
     ); //would initialise a ram module
 
-    cpu_bus cpuInst(.clk(clk), .rst(reset), .active(active), .waitrequest(waitrequest),
+    mips_cpu_bus cpuInst(.clk(clk), .rst(reset), .active(active), .waitrequest(waitrequest),
         .address(CPUaddress), .write(write), .read(read), 
         .writedata(writedata), .readdata(readdata), .byteenable(byteenable),
         .register_v0(register_v0)
