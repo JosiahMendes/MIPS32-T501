@@ -46,7 +46,7 @@ if test -d "test/testcases/${INSTR}" ; then
         #if it returned a failure code
         if [[ "${RESULT}" -ne 0 ]] ; then
             echo "${TESTNAME} ${INSTR} Fail"
-            rm test/testcases/${INSTR}/${TESTNAME}.stdout
+            #rm test/testcases/${INSTR}/${TESTNAME}.stdout
             rm test/testcases/${INSTR}/${TESTNAME}
             exit
         fi

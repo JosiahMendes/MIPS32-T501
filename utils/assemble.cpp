@@ -16,7 +16,8 @@ vector<string> wordseperator(string str);
 unordered_map<string,string> regDefine();
 unordered_map<string,string> immDefine();
 unordered_map<string,string> jumDefine();
-string regTrans(string str, int lineNum);
+string regTrans(string str, int lineNum, unordered_map<string,int> &registerlist);
+unordered_map<string,int> registers();
 
 bool is_number(const string& s);
 string to_hex(string str);
@@ -35,6 +36,8 @@ int main(int argc, char**argv){
     unordered_map<string,string> registerMap = regDefine();
     unordered_map<string,string> immediateMap = immDefine();
     unordered_map<string,string> jumpMap = jumDefine();
+    unordered_map<string,int> registerlist = registers();
+    
 
     
     if(argc == 1){
@@ -85,54 +88,54 @@ int main(int argc, char**argv){
                 binTrans = "000000";
                 if(line[0] == "jr"){
                     if (line.size()!=2){invalidInstruction(lineNum);}
-                    binTrans = binTrans + regTrans(line[1],lineNum)+ bitset<15>(0).to_string() + registerMap.at(line[0]);
+                    binTrans = binTrans + regTrans(line[1],lineNum, registerlist)+ bitset<15>(0).to_string() + registerMap.at(line[0]);
                 }else if(line[0] == "mfhi" ||line[0] == "mflo"){
                     if (line.size()!=2){invalidInstruction(lineNum);}
-                    binTrans = binTrans + bitset<10>(0).to_string()+ regTrans(line[1],lineNum)+ bitset<5>(0).to_string() + registerMap.at(line[0]);
+                    binTrans = binTrans + bitset<10>(0).to_string()+ regTrans(line[1],lineNum, registerlist)+ bitset<5>(0).to_string() + registerMap.at(line[0]);
                 }else if(line[0] == "mthi" ||line[0] == "mtlo" || line[0] == "mthi" ||line[0] == "mtlo"){
                     if (line.size()!=2){invalidInstruction(lineNum);}
-                    binTrans = binTrans + regTrans(line[1],lineNum)+ bitset<15>(0).to_string() + registerMap.at(line[0]);
+                    binTrans = binTrans + regTrans(line[1],lineNum, registerlist)+ bitset<15>(0).to_string() + registerMap.at(line[0]);
                 }else if(line[0] == "jalr"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = binTrans + regTrans(line[1],lineNum) + bitset<5>(0).to_string() + regTrans(line[2],lineNum)+ bitset<5>(0).to_string() + registerMap.at(line[0]);
+                    binTrans = binTrans + regTrans(line[1],lineNum, registerlist) + bitset<5>(0).to_string() + regTrans(line[2],lineNum, registerlist)+ bitset<5>(0).to_string() + registerMap.at(line[0]);
                 }else if (line[0] == "mult" ||line[0] == "multu" || line[0] == "div" ||line[0] == "divu"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = binTrans + regTrans(line[1],lineNum) + regTrans(line[2],lineNum) + bitset<10>(0).to_string()+registerMap.at(line[0]);
+                    binTrans = binTrans + regTrans(line[1],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist) + bitset<10>(0).to_string()+registerMap.at(line[0]);
                 }else if(line[0] == "sll" || line[0] =="srl" || line[0] == "sra"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
-                    binTrans = binTrans + bitset<5>(0).to_string() + regTrans(line[1],lineNum) + regTrans(line[2],lineNum) + bitset<5>(stol(line[3])).to_string()+ registerMap.at(line[0]);
+                    binTrans = binTrans + bitset<5>(0).to_string() + regTrans(line[1],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist) + bitset<5>(stol(line[3])).to_string()+ registerMap.at(line[0]);
                 }else if (line[0] == "sllv" || line[0] =="slrv"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
-                    binTrans = binTrans + regTrans(line[3],lineNum) + regTrans(line[2],lineNum)+ regTrans(line[1],lineNum) + bitset<5>(0).to_string() + registerMap.at(line[0]);
+                    binTrans = binTrans + regTrans(line[3],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist)+ regTrans(line[1],lineNum, registerlist) + bitset<5>(0).to_string() + registerMap.at(line[0]);
                 }else{
                     if (line.size()!=4){invalidInstruction(lineNum);}
-                    binTrans = binTrans + regTrans(line[2],lineNum) + regTrans(line[3],lineNum)+ regTrans(line[1],lineNum) + bitset<5>(0).to_string() + registerMap.at(line[0]);
+                    binTrans = binTrans + regTrans(line[2],lineNum, registerlist) + regTrans(line[3],lineNum, registerlist)+ regTrans(line[1],lineNum, registerlist) + bitset<5>(0).to_string() + registerMap.at(line[0]);
                 }
             }else if(immediateMap.find(line[0]) != immediateMap.end()){
                 if(line[0] == "lui"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + "00000" + regTrans(line[1],lineNum) + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + "00000" + regTrans(line[1],lineNum, registerlist) + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }else if(line[0] == "bltz" || line[0] == "blez" || line[0] == "bgtz"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + "00000" + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "00000" + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }else if(line[0] == "bgez"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + "00001" + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "00001" + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }else if(line[0] == "bltzal"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + "10000" + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "10000" + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }else if(line[0] == "bgezal"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + "10001" + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + "10001" + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }else if(line[0] == "bne" || line[0] == "beq"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum) + regTrans(line[2],lineNum) + bitset<16>(stol(line[3],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist) + bitset<16>(stol(line[3],nullptr,16)).to_string();
                 } else if (line[0] == "addiu" || line[0] == "andiu" ||line[0] == "ori" ||line[0] == "xori"||line[0] == "slti"||line[0] == "sltiu"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[2],lineNum) + regTrans(line[1],lineNum) + bitset<16>(stol(line[3],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[2],lineNum, registerlist) + regTrans(line[1],lineNum, registerlist) + bitset<16>(stol(line[3],nullptr,16)).to_string();
                 } else{
                     if (line.size()!=4){invalidInstruction(lineNum);}
-                    binTrans = immediateMap.at(line[0]) + regTrans(line[3],lineNum) + regTrans(line[1],lineNum) + bitset<16>(stol(line[2],nullptr,16)).to_string();
+                    binTrans = immediateMap.at(line[0]) + regTrans(line[3],lineNum, registerlist) + regTrans(line[1],lineNum, registerlist) + bitset<16>(stol(line[2],nullptr,16)).to_string();
                 }
             }else if(jumpMap.find(line[0]) != jumpMap.end()){
                 if(line[0] == "j"){
@@ -236,9 +239,11 @@ void invalidInstruction(int lineNum){
     exit(EXIT_FAILURE);
 }
 
-string regTrans(string str, int lineNum){
+string regTrans(string str, int lineNum, unordered_map<string,int> &registerlist){
     int reg;
-    if (str[0] != '$'){
+    if(registerlist.find(str) != registerlist.end()){
+        return bitset<5>(registerlist.at(str)).to_string();
+    }else if (str[0] != '$'){
         cerr << "Register " << str << " at line "<< lineNum << " is invalid" <<endl;
         exit(EXIT_FAILURE);
     } else {
@@ -300,6 +305,44 @@ unordered_map<string,string> regDefine(){
     umap["srlv"] = "000110";
     umap["subu"] = "100011";
     umap["xor"]  = "100110";
+
+    return umap;
+}
+
+unordered_map<string,int> registers(){
+    unordered_map<string, int> umap;
+    umap["r0"] = 0;
+    umap["at"] =1;
+    umap["v0"] = 2;
+    umap["v1"] = 3;
+    umap["a0"] = 4;
+    umap["a1"] = 5;
+    umap["a2"] = 6;
+    umap["a3"] = 7;
+    umap["t0"] = 8;
+    umap["t1"] = 9;
+    umap["t2"] = 10;
+    umap["t3"] = 11;
+    umap["t4"] = 12;
+    umap["t5"] = 13;
+    umap["t6"] = 14;
+    umap["t7"] = 15;
+    umap["s0"] = 16;
+    umap["s1"] = 17;
+    umap["s1"] = 18;
+    umap["s3"] = 19;
+    umap["s4"] = 20;
+    umap["s5"] = 21;
+    umap["s6"] = 22;
+    umap["s7"] = 23;
+    umap["t8"] = 24;
+    umap["t9"] = 25;
+    umap["k0"] = 26;
+    umap["k1"] = 27;
+    umap["gp"] = 28;
+    umap["sp"] = 29;
+    umap["s8"] = 30;
+    umap["ra"] = 31;
 
     return umap;
 }
