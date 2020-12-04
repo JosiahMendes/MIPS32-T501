@@ -124,7 +124,10 @@ module mips_cpu_bus(
         ALU_XOR = 5'd5,
         ALU_SLL = 5'd6,
         ALU_SRL = 5'd7,
-        ALU_SRA = 5'd8
+        ALU_SRA = 5'd8,
+        ALU_SLLV = 5'd9,
+        ALU_SRLV = 5'd10,
+        ALU_SRAV = 5'd11
     }aluop_t;
 
     // Statemachine -> MIPS uses a maximum of 5 states. Starting off with decimal state indexes (0-4)
@@ -241,7 +244,15 @@ module mips_cpu_bus(
                         FUNC_OR: begin
                             ALUop <= ALU_OR;
                         end
-
+                        FUNC_SLLV: begin
+                            ALUop <= ALU_SLLV;
+                        end
+                        FUNC_SRLV: begin
+                            ALUop <= ALU_SRLV;
+                        end
+                        FUNC_SRAV: begin
+                            ALUop <= ALU_SRAV;
+                        end
                     endcase
                 end
             endcase

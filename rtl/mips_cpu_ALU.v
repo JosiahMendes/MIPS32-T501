@@ -22,7 +22,9 @@ module mips_cpu_ALU (
       6: begin result = b << sa; end//shift left
       7: begin result = b >> sa; end //shift right
       8: begin result = b >>> sa; end //arithmetic shift right
-
+      9: begin result = a << b[4:0]; end //shift left variable
+      10: begin result = a >> b[4:0]; end //shift right variable
+      11: begin result = a >>> b[4:0]; end //arithmetic shift right variable
 
     endcase
   end

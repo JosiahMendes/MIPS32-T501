@@ -1,5 +1,5 @@
 addiu v0 v0 10
-addiu v1 v1 bfc0
+addiu v1 v1 0xbfc0
 sll v1 v1 16
 addiu v1 v1 24
 jr r0
