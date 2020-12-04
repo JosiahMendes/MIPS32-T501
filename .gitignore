@@ -19,5 +19,8 @@
 
 #Ignore vcds
 *.vcd
+.vscode/settings.json
 a.out
 a.out
+
+*_MEM.txt
