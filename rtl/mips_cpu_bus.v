@@ -48,20 +48,20 @@ module cpu_bus(
         OPCODE_ANDI  = 8'b001100,
 
         OPCODE_BEQ    = 8'b000100,
-        OPCODE_BGEZ   = 8'b000001,
-        OPCODE_BGEZAL = 8'b000001,
+        //OPCODE_BGEZ   = 8'b000001,
+        //OPCODE_BGEZAL = 8'b000001,
         OPCODE_BLEZ   = 8'b000110,
-        OPCODE_BLTZ   = 8'b000001,
-        OPCODE_BLTZAL = 8'b000001,
+        //OPCODE_BLTZ   = 8'b000001,
+        //OPCODE_BLTZAL = 8'b000001,
         OPCODE_BNE    = 8'b000101,
         OPCODE_LB     = 8'b100000,
         OPCODE_LBU    = 8'b100100,
-        OPCODE_LHU    = 8'b100100,
+        OPCODE_LHU    = 8'b100101,
         OPCODE_LUI    = 8'b001111,
         OPCODE_LW     = 8'b100011,
         OPCODE_LWL    = 8'b100010,
         OPCODE_LWR    = 8'b100110,
-        OPCODE_ORI    = 8'b001101, 
+        OPCODE_ORI    = 8'b001101,
         OPCODE_SB     = 8'b101000,
         OPCODE_SH     = 8'b101001,
         OPCODE_SLTI   = 8'b001010,
@@ -85,13 +85,13 @@ module cpu_bus(
         FUNC_AND  = 8'b100100,
         FUNC_OR   = 8'b100101,
 
-        FUNC_DIV  = 8'b001001,
+        FUNC_DIV  = 8'b011010,
         FUNC_DIVU = 8'b011011,
         FUNC_MULT = 8'b011000,
         FUNC_MULTU= 8'b011001,
 
         FUNC_MFHI = 8'b010000,
-        FUNC_MFLO = 8'b010000,
+        FUNC_MFLO = 8'b010010,
         FUNC_MTHI = 8'b010001,
         FUNC_MTLO = 8'b010011,
 
@@ -102,7 +102,7 @@ module cpu_bus(
         FUNC_SRA  = 8'b000011,
         FUNC_SRAV = 8'b000111,
         FUNC_SRL  = 8'b000010,
-        FUNC_SRLV = 8'b000110        
+        FUNC_SRLV = 8'b000110
 
     } func_t;
 
@@ -169,7 +169,7 @@ module cpu_bus(
     //Branch Delay Slot Handling
     logic [2:0] branch;
 
-    
+
     // This is the simple state machine. The state switching is just drafted, and will depend on the individual instructions
     always @(posedge clk) begin
         if (rst) begin
@@ -184,7 +184,7 @@ module cpu_bus(
             $display("-------------------------------------------------------------------------------------------------------------PC = %h",PC);
             $display("CPU-FETCH,      Fetching instruction @ %h     branch status is ",address, branch);
             //state<=INSTR_DECODE;
-            if(address == 32'h00000000) begin 
+            if(address == 32'h00000000) begin
                 active <= 0; state<=HALTED;
             end else begin state<=INSTR_DECODE; end
             regReset <= 0;
@@ -266,7 +266,7 @@ module cpu_bus(
             end else begin
                 branch <= 0;
                 PC <= PC_increment;
-            end 
+            end
             //Done
         end
         if(state == HALTED)begin

@@ -4,8 +4,8 @@
 using namespace std;
 
 int main(){
-    cout <<"c0 bf 0f 24 00 7c 0f 00 23 01 09 24 a0 00 e9 ad 08 00 00 00 a0 00 e2 8d"<<endl;
-    for (int i = 0; i<16777192; i++){
+    cout <<"0a 00 42 24 c0 bf 63 24 00 1c 03 00 18 00 63 24 08 00 60 00 0a 00 42 24 08 00 00 00 14 00 42 24"<<endl;
+    for (int i = 0; i<16777216-32; i++){
         cout << "00 ";
     }
 }
