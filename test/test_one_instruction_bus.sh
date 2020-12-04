@@ -15,7 +15,7 @@ if test -d "test/testcases/${INSTR}" ; then
 
         >&2 echo "  Running Test ${TESTNAME}"
         >&2 echo "    1 - Assembling input file"
-        g++ utils/assemble.cpp -o utils/assembler
+        
         utils/assembler test/testcases/${INSTR}/${TESTNAME}.asm hex littleEndian 1 > test/testcases/${INSTR}/${TESTNAME}_MEM.txt
 
         >&2 echo "    2 - Compiling test-bench"
