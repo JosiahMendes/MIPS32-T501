@@ -1,4 +1,6 @@
 #include<iostream>
+#include <iomanip>
+#include <iterator>
 #include<fstream>
 #include<sstream>
 #include<vector>
@@ -8,6 +10,8 @@
 #include<cstdlib>
 #include<bitset>
 #include <map>
+#include <string.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -42,9 +46,9 @@ int main(int argc, char**argv){
     unordered_map<string,string> immediateMap = immDefine();
     unordered_map<string,string> jumpMap = jumDefine();
     unordered_map<string,int> registerlist = registers();
-    
 
-    
+
+
     if(argc == 1){
         cerr << "No file defined";
         exit(EXIT_FAILURE);
@@ -154,19 +158,19 @@ int main(int argc, char**argv){
                 invalidInstruction(lineNum);
                 exit(EXIT_FAILURE);
             }
-            
-            
+
+
 
             string hexTrans = bin_to_hex(binTrans.substr(0,8))+" "+bin_to_hex(binTrans.substr(8,8))+" "+bin_to_hex(binTrans.substr(16,8))+" "+bin_to_hex(binTrans.substr(24,8));
             string littleEndianTrans = hexTrans.substr(9,2)+" "+hexTrans.substr(6,2)+" "+hexTrans.substr(3,2)+" "+hexTrans.substr(0,2);
-            
+
             if(littleEndian){
                 cout<<littleEndianTrans<<endl;
             }else if(!hex){
                 cout << binTrans <<endl;
             }else {
                 cout << hexTrans <<endl;
-            }    
+            }
         }
 
         //Writing additional data and zeros to memory
@@ -198,7 +202,7 @@ int main(int argc, char**argv){
                 exit(EXIT_FAILURE);
             }else {
                 memoryaddress.insert(pair<long,string>(tolong(line[0]),tohex(line[1])));
-            }       
+            }
         }
         if(writeZeros){
             for (long i = (lineNum*4)+resetVector; i < memSize+resetVector; i++){
@@ -262,7 +266,7 @@ vector<string> wordseperator(string str)
     transform(str.begin(), str.end(), str.begin(), ::tolower);
 
     stringstream ss(str);
- 
+
     istream_iterator<string> begin(ss);
     istream_iterator<std::string> end;
     vector<string> vstrings(begin, end);
@@ -271,7 +275,7 @@ vector<string> wordseperator(string str)
 }
 
 void invalidInstruction(int lineNum){
-    cerr << "Invalid Instruction at line " << lineNum << endl; 
+    cerr << "Invalid Instruction at line " << lineNum << endl;
     exit(EXIT_FAILURE);
 }
 
@@ -415,6 +419,6 @@ bool is_number(const string& s)
     for (int i = 0; i < s.length(); i++)
         if (isdigit(s[i]) == false)
             return false;
- 
+
     return true;
 }
