@@ -11,7 +11,7 @@ Create a file `instr{i}.asm` where `i` is the testcase number, and write assembl
 - Arithmetic/Logical Instructions (Immediate) -> `addu $dest $src1 immediate`
 - Shifts -> `sll $dest $src sa`
 
-> Most immediate/non-registers except for shift amount are specified in hexadecimal -> will add a way to switch between decimal and hex when possible. 
+FIXED! Specifiy hexadecimal by adding 0x to number, otherwise treated as decimal!
 
 #### Loading Data
 If you need to load data to another place in memory it should look like this. 
