@@ -4,6 +4,7 @@ set -eou pipefail
 SRC="$1"
 INSTR="$2"
 
+g++ utils/assemble.cpp -o utils/assembler
 #check if testcases for instruction exist
 if test -d "test/testcases/${INSTR}" ; then
     #loop through every testcases available
@@ -15,7 +16,10 @@ if test -d "test/testcases/${INSTR}" ; then
 
         >&2 echo "  Running Test ${TESTNAME}"
         >&2 echo "    1 - Assembling input file"
-        
+
+        rm -f test/testcases/${INSTR}/${TESTNAME}_MEM.txt
+        rm -f test/testcases/${INSTR}/${TESTNAME}_MEM.stdout
+
         utils/assembler test/testcases/${INSTR}/${TESTNAME}.asm hex littleEndian 1 > test/testcases/${INSTR}/${TESTNAME}_MEM.txt
 
         >&2 echo "    2 - Compiling test-bench"
