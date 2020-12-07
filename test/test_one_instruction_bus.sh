@@ -29,13 +29,13 @@ if test -d "test/testcases/${INSTR}" ; then
                 -s mips_cpu_bus_tb \
                 -P mips_cpu_bus_tb.RAM_INIT_FILE=\"test/testcases/${INSTR}/${TESTNAME}_MEM.txt\" \
                 -o test/testcases/${INSTR}/${TESTNAME} \
-                ${SRC}/mips_cpu_*.v ${SRC}/mips_cpu/*.v test/mips_cpu_bus_tb.v
+                ${SRC}/mips_cpu_*.v ${SRC}/mips_cpu/*.v test/mips_cpu_bus_tb_memory.v test/mips_cpu_bus_tb.v
         else
             iverilog -g 2012 \
                 -s mips_cpu_bus_tb \
                 -P mips_cpu_bus_tb.RAM_INIT_FILE=\"test/testcases/${INSTR}/${TESTNAME}_MEM.txt\" \
                 -o test/testcases/${INSTR}/${TESTNAME} \
-                ${SRC}/mips_cpu_*.v test/mips_cpu_bus_tb.v
+                ${SRC}/mips_cpu_*.v test/mips_cpu_bus_tb_memory.v test/mips_cpu_bus_tb.v
         fi
 
 

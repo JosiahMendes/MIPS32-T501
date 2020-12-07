@@ -155,11 +155,15 @@ module mips_cpu_bus(
 
     logic regDestDataSel, regWriteEnable;
 
-    assign regDestDataSel = (instr_opcode == OPCODE_LW) ? 1 :0; //TODO temp
+    assign regDestDataSel = (instr_opcode == OPCODE_LWR||instr_opcode == OPCODE_LHU
+                            ||instr_opcode == OPCODE_LBU||instr_opcode == OPCODE_LW
+                            ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LH
+                            ||instr_opcode == OPCODE_LB||instr_opcode == OPCODE_LUI) ? 1 :0;
+
     assign regWriteEnable = !(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MTLO ||R_instr_func == FUNC_MTHI 
                                                         ||R_instr_func == FUNC_JR ||R_instr_func == FUNC_MULT 
                                                         ||R_instr_func == FUNC_MULTU ||R_instr_func == FUNC_DIV 
-                                                        ||R_instr_func == FUNC_DIVU) 
+                                                        ||R_instr_func == FUNC_DIVU ) 
                                                         || instr_opcode == 6'b000001 || instr_opcode == OPCODE_J 
                                                         || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE 
                                                         || instr_opcode == OPCODE_BLEZ ||  instr_opcode == OPCODE_BGTZ 
@@ -247,6 +251,10 @@ module mips_cpu_bus(
                 OPCODE_LW: begin
                     ALUop <= ALU_ADD;
                 end
+                OPCODE_LB: begin
+                    ALUop <= ALU_ADD;
+                end
+
                 OPCODE_SW: begin
                     ALUop <= ALU_ADD;
                 end

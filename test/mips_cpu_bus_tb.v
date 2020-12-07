@@ -1,4 +1,3 @@
-//`include "rtl/mips_cpu_bus_memory.v"
 module mips_cpu_bus_tb;
     timeunit 1ns / 10ps;
 
@@ -22,7 +21,7 @@ module mips_cpu_bus_tb;
 
     assign RAMaddress = CPUaddress-32'hBFC00000;
 
-    mips_cpu_bus_memory #(RAM_INIT_FILE) ramInst(.clk(clk), .write(write), .read(read), 
+    mips_cpu_bus_tb_memory #(RAM_INIT_FILE) ramInst(.clk(clk), .write(write), .read(read), 
         .writedata(writedata), .addr(RAMaddress), .byteenable(byteenable),
         .waitrequest(waitrequest), .readdata(readdata)
     ); //would initialise a ram module

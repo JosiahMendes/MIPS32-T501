@@ -1,4 +1,4 @@
-module mips_cpu_bus_memory
+module mips_cpu_bus_tb_memory
     (
         input logic clk,
         input logic read,
