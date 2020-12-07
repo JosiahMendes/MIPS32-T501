@@ -5,7 +5,7 @@ module mips_cpu_bus_memory
         input logic write,
 
         input logic [3:0] byteenable,
-        input logic [24-1:0] addr,
+        input logic [15:0] addr,
         input logic [31:0] writedata,
 
         output logic waitrequest,
@@ -15,11 +15,11 @@ module mips_cpu_bus_memory
     timeunit 1ns/100ps;
     parameter RAM_INIT_FILE ="";
 
-    reg[7:0] memory [0:16777215];
+    reg[7:0] memory [0:32767];
 
     initial begin
         integer i;
-        for (i = 0; i<16777216; i++)begin
+        for (i = 0; i<32768; i++)begin
             memory[i] = 0;
         end
         if (RAM_INIT_FILE != "") begin

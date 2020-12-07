@@ -18,7 +18,7 @@ module mips_cpu_bus_tb;
     logic[31:0] register_v0;
     logic[3:0] byteenable;
     logic[31:0] CPUaddress;
-    logic[23:0] RAMaddress;
+    logic[15:0] RAMaddress;
 
     assign RAMaddress = CPUaddress-32'hBFC00000;
 
