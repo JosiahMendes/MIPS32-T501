@@ -40,7 +40,7 @@ int main(int argc, char**argv){
     bool hex;
     bool writeZeros;
     int lineNum = 0;
-    long memSize = 16777216;
+    long memSize = 32768;
 
     unordered_map<string,string> registerMap = regDefine();
     unordered_map<string,string> immediateMap = immDefine();
@@ -91,8 +91,8 @@ int main(int argc, char**argv){
             string binTrans;
             replace(instr.begin(), instr.end(), '(', ' ');
             replace(instr.begin(), instr.end(), ')', ' ');
-            vector<string> line = wordseperator(instr);
-            if (line.size()>4){line.resize(4);}
+            string temp = instr.substr(0, instr.find("#", 0));
+            vector<string> line = wordseperator(temp);
             if(registerMap.find(line[0])!=registerMap.end()){
                 binTrans = "000000";
                 if(line[0] == "jr"){
