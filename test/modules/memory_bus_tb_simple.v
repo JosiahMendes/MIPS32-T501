@@ -9,7 +9,7 @@ module memory_tb_simple();
     logic[24-1:0] addr;
     logic[3:0] byteenable;
 
-    mips_cpu_bus_memory mem(
+    mips_cpu_bus_tb_memory mem(
         .clk(clk),
         .write(write),
         .read(read),

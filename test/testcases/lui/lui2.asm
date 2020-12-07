@@ -1,0 +1,2 @@
+jr r0
+lui v0 0xF

@@ -11,10 +11,12 @@ module mips_cpu_ALU (
 
   logic [4:0] sav;
   logic signed [31:0] sra_var;
+  logic [15:0] lower;
 
   assign zero = (result == 0);
   assign sav = (op==9 || op==10 || op==11) ? a[4:0] : 0;
   assign sra_var = b;
+  assign lower = b[15:0];
 
 
   always_comb begin
@@ -31,6 +33,7 @@ module mips_cpu_ALU (
       9: begin result = b << sav; end //shift left variable
       10: begin result = b >> sav; end //shift right variable
       11: begin result = sra_var >>> sav; end //arithmetic shift right variable
+      12: begin result = {lower,16'd0}; end
 
     endcase
   end

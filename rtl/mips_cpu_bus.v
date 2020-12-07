@@ -132,7 +132,8 @@ module mips_cpu_bus(
         ALU_SRA = 5'd8,
         ALU_SLLV = 5'd9,
         ALU_SRLV = 5'd10,
-        ALU_SRAV = 5'd11
+        ALU_SRAV = 5'd11,
+        ALU_LUI  = 5'd12
     }aluop_t;
 
     // Statemachine -> MIPS uses a maximum of 5 states. Starting off with decimal state indexes (0-4)
@@ -153,12 +154,13 @@ module mips_cpu_bus(
     logic [4:0]  regDest,     regRdA,     regRdB;
     logic [31:0] regDestData, regRdDataA, regRdDataB;
 
-    logic regDestDataSel, regWriteEnable;
+    logic regWriteEnable;
+    logic [2:0] regDestDataSel;
 
     assign regDestDataSel = (instr_opcode == OPCODE_LWR||instr_opcode == OPCODE_LHU
                             ||instr_opcode == OPCODE_LBU||instr_opcode == OPCODE_LW
                             ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LH
-                            ||instr_opcode == OPCODE_LB||instr_opcode == OPCODE_LUI) ? 1 :0;
+                            ||instr_opcode == OPCODE_LB) ? 1 :0;
 
     assign regWriteEnable = !(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MTLO ||R_instr_func == FUNC_MTHI 
                                                         ||R_instr_func == FUNC_JR ||R_instr_func == FUNC_MULT 
@@ -175,7 +177,7 @@ module mips_cpu_bus(
     logic [31:0] ALUInA, ALUInB, ALUOut;
     logic ALUZero;
     logic ALUSrc;
-    assign ALUSrc = (instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL) ? 0:1;
+    assign ALUSrc = (instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL)? 0:1;
 
     //Sign Extender
     logic [15:0] unextended;
@@ -188,9 +190,11 @@ module mips_cpu_bus(
                                         (instr_opcode == OPCODE_LWR||instr_opcode == OPCODE_LHU
                                         ||instr_opcode == OPCODE_LBU||instr_opcode == OPCODE_LW
                                         ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LH
-                                        ||instr_opcode == OPCODE_LB||instr_opcode == OPCODE_LUI))
+                                        ||instr_opcode == OPCODE_LB))
                     ) ? 1 : 0;
-    assign byteenable = 4'b1111;//TODO Temp
+    assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW || instr_opcode == OPCODE_SW))) ? 4'b1111 
+                        : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? 4'b0001
+                        : 4'b0000;//TODO Temp
     assign write =  (state == MEM &&    (instr_opcode == OPCODE_SW || instr_opcode == OPCODE_SB
                                         ||instr_opcode == OPCODE_SH)
                     ) ? 1 :0; //TODO Temp
@@ -253,6 +257,9 @@ module mips_cpu_bus(
                 end
                 OPCODE_LB: begin
                     ALUop <= ALU_ADD;
+                end
+                OPCODE_LUI: begin
+                    ALUop <=ALU_LUI;
                 end
 
                 OPCODE_SW: begin
