@@ -43,69 +43,71 @@ module mips_cpu_bus(
     wire [25:0]  J_instr_addr        = instr[25:0];
 
     // Instruction opcode is enumerated
-    typedef enum logic[7:0] {
-        OPCODE_ADDIU = 8'b001001,
-        OPCODE_ANDI  = 8'b001100,
-        OPCODE_ORI    = 8'b001101,
-        OPCODE_XORI   = 8'b001110,
+    typedef enum logic[5:0] {
+        OPCODE_ADDIU = 6'b001001,
+        OPCODE_ANDI  = 6'b001100,
+        OPCODE_ORI    = 6'b001101,
+        OPCODE_XORI   = 6'b001110,
 
-        OPCODE_BEQ    = 8'b000100,//TODO
-        //OPCODE_BGEZ   = 8'b000001,//TODO
-        //OPCODE_BGEZAL = 8'b000001,//TODO
-        OPCODE_BLEZ   = 8'b000110,//TODO
-        //OPCODE_BLTZ   = 8'b000001,//TODO
-        //OPCODE_BLTZAL = 8'b000001,//TODO
-        OPCODE_BNE    = 8'b000101,//TODO
-        OPCODE_SLTI   = 8'b001010,//TODO
+        OPCODE_BEQ    = 6'b000100,//TODO
+        //OPCODE_BGEZ   = 6'b000001,//TODO
+        //OPCODE_BGEZAL = 6'b000001,//TODO
+        OPCODE_BLEZ   = 6'b000110,//TODO
+        OPCODE_BGTZ   = 6'b000111,
+        //OPCODE_BLTZ   = 6'b000001,//TODO
+        //OPCODE_BLTZAL = 6'b000001,//TODO
+        OPCODE_BNE    = 6'b000101,//TODO
+        OPCODE_SLTI   = 6'b001010,//TODO
 
-        OPCODE_LB     = 8'b100000,//TODO
-        OPCODE_LBU    = 8'b100100,//TODO
-        OPCODE_LHU    = 8'b100101,//TODO
-        OPCODE_LUI    = 8'b001111,//TODO
-        OPCODE_LW     = 8'b100011,//TODO
-        OPCODE_LWL    = 8'b100010,//TODO
-        OPCODE_LWR    = 8'b100110,//TODO
+        OPCODE_LB     = 6'b100000,//TODO
+        OPCODE_LBU    = 6'b100100,//TODO
+        OPCODE_LHU    = 6'b100101,//TODO
+        OPCODE_LH     = 6'b100001,
+        OPCODE_LUI    = 6'b001111,//TODO
+        OPCODE_LW     = 6'b100011,//TODO
+        OPCODE_LWL    = 6'b100010,//TODO
+        OPCODE_LWR    = 6'b100110,//TODO
 
-        OPCODE_SB     = 8'b101000,//TODO
-        OPCODE_SH     = 8'b101001,//TODO
-        OPCODE_SW     = 8'b101011,//TODO
+        OPCODE_SB     = 6'b101000,//TODO
+        OPCODE_SH     = 6'b101001,//TODO
+        OPCODE_SW     = 6'b101011,//TODO
 
-        OPCODE_J      = 8'b000010,//TODO
-        OPCODE_JAL    = 8'b000011,//TODO
+        OPCODE_J      = 6'b000010,//TODO
+        OPCODE_JAL    = 6'b000011,//TODO
 
-        OPCODE_R    = 8'b000000
+        OPCODE_R    = 6'b000000
 
     } opcode_t;
 
-    typedef enum logic[7:0] {
-        FUNC_JR = 8'b001000,
-        FUNC_JALR = 8'b001001,//TODO
+    typedef enum logic[5:0] {
+        FUNC_JR = 6'b001000,
+        FUNC_JALR = 6'b001001,//TODO
 
-        FUNC_ADDU = 8'b100001,
-        FUNC_SUBU = 8'b100011,
-        FUNC_XOR  = 8'b100110,
-        FUNC_AND  = 8'b100100,
-        FUNC_OR   = 8'b100101,
+        FUNC_ADDU = 6'b100001,
+        FUNC_SUBU = 6'b100011,
+        FUNC_XOR  = 6'b100110,
+        FUNC_AND  = 6'b100100,
+        FUNC_OR   = 6'b100101,
 
-        FUNC_DIV  = 8'b011010,//TODO
-        FUNC_DIVU = 8'b011011,//TODO
-        FUNC_MULT = 8'b011000,//TODO
-        FUNC_MULTU= 8'b011001,//TODO
+        FUNC_DIV  = 6'b011010,//TODO
+        FUNC_DIVU = 6'b011011,//TODO
+        FUNC_MULT = 6'b011000,//TODO
+        FUNC_MULTU= 6'b011001,//TODO
 
-        FUNC_MFHI = 8'b010000,//TODO
-        FUNC_MFLO = 8'b010010,//TODO
-        FUNC_MTHI = 8'b010001,//TODO
-        FUNC_MTLO = 8'b010011,//TODO
+        FUNC_MFHI = 6'b010000,//TODO
+        FUNC_MFLO = 6'b010010,//TODO
+        FUNC_MTHI = 6'b010001,//TODO
+        FUNC_MTLO = 6'b010011,//TODO
 
-        FUNC_SLT  = 8'b101010,//TODO
-        FUNC_SLTU = 8'b101011,//TODO
+        FUNC_SLT  = 6'b101010,//TODO
+        FUNC_SLTU = 6'b101011,//TODO
 
-        FUNC_SLL  = 8'b000000,
-        FUNC_SLLV = 8'b000100,
-        FUNC_SRA  = 8'b000011,
-        FUNC_SRAV = 8'b000111,
-        FUNC_SRL  = 8'b000010,
-        FUNC_SRLV = 8'b000110
+        FUNC_SLL  = 6'b000000,
+        FUNC_SLLV = 6'b000100,
+        FUNC_SRA  = 6'b000011,
+        FUNC_SRAV = 6'b000111,
+        FUNC_SRL  = 6'b000010,
+        FUNC_SRLV = 6'b000110
 
     } func_t;
 
@@ -151,7 +153,18 @@ module mips_cpu_bus(
     logic [4:0]  regDest,     regRdA,     regRdB;
     logic [31:0] regDestData, regRdDataA, regRdDataB;
 
-    logic regDestDataSel;
+    logic regDestDataSel, regWriteEnable;
+
+    assign regDestDataSel = (instr_opcode == OPCODE_LW) ? 1 :0; //TODO temp
+    assign regWriteEnable = !(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MTLO ||R_instr_func == FUNC_MTHI 
+                                                        ||R_instr_func == FUNC_JR ||R_instr_func == FUNC_MULT 
+                                                        ||R_instr_func == FUNC_MULTU ||R_instr_func == FUNC_DIV 
+                                                        ||R_instr_func == FUNC_DIVU) 
+                                                        || instr_opcode == 6'b000001 || instr_opcode == OPCODE_J 
+                                                        || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE 
+                                                        || instr_opcode == OPCODE_BLEZ ||  instr_opcode == OPCODE_BGTZ 
+                                                        || instr_opcode == OPCODE_SB || instr_opcode == OPCODE_SH 
+                                                        || instr_opcode == OPCODE_SW);
 
     //ALU Connections
     logic [4:0] ALUop;
@@ -167,10 +180,16 @@ module mips_cpu_bus(
 
     //Memory Control
     assign address = (state == INSTR_FETCH) ? PC : ALUOut;
-    assign read = (state==INSTR_FETCH || (state == MEM && instr_opcode == OPCODE_LW)) ? 1 :0;
+    assign read =   (state==INSTR_FETCH || (state == MEM && 
+                                        (instr_opcode == OPCODE_LWR||instr_opcode == OPCODE_LHU
+                                        ||instr_opcode == OPCODE_LBU||instr_opcode == OPCODE_LW
+                                        ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LH
+                                        ||instr_opcode == OPCODE_LB||instr_opcode == OPCODE_LUI))
+                    ) ? 1 : 0;
     assign byteenable = 4'b1111;//TODO Temp
-    assign write = (state == MEM && instr_opcode == OPCODE_SW) ? 1 :0; //TODO Temp
-    assign regDestDataSel = (instr_opcode == OPCODE_LW) ? 1 :0; //TODO temp
+    assign write =  (state == MEM &&    (instr_opcode == OPCODE_SW || instr_opcode == OPCODE_SB
+                                        ||instr_opcode == OPCODE_SH)
+                    ) ? 1 :0; //TODO Temp
     assign writedata = regRdDataB;
 
     //Branch Delay Slot Handling
@@ -290,7 +309,7 @@ module mips_cpu_bus(
             state <= INSTR_FETCH;
             regDest <= (instr_opcode == OPCODE_R) ? R_instr_rd: I_instr_rt;
             regDestData <= (regDestDataSel) ? readdata : ALUOut;
-            regWriteEn<=1;
+            regWriteEn<= (regWriteEnable) ? 1 : 0;
             if (branch == 1) begin
                 branch <=2;
                 PC <= PC_increment;
