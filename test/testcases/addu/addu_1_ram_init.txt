@@ -1,1 +1,0 @@
-ram init file for addu_1
