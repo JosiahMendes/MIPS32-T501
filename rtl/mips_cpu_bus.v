@@ -320,10 +320,15 @@ module mips_cpu_bus(
             //Done
         end
         if (state==WRITE_BACK) begin
-            $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d..." ,readdata, ALUOut, I_instr_rt);
+            $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d... %d" ,readdata, ALUOut, I_instr_rt, instr_opcode);
             state <= INSTR_FETCH;
             regDest <= (instr_opcode == OPCODE_R) ? R_instr_rd: I_instr_rt;
-            regDestData <= (regDestDataSel) ? readdata : ALUOut;
+            regDestData <= (instr_opcode == OPCODE_LB)    ? {{24{readdata[7]}},readdata[7:0]} 
+                            :(instr_opcode == OPCODE_LBU) ? {{24'd0,readdata[7:0]}}
+                            :(instr_opcode == OPCODE_LH)  ? {{16{readdata[15]}},readdata[15:0]}
+                            :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}} 
+                            :(instr_opcode == OPCODE_LW)  ? readdata
+                            :ALUOut;
             regWriteEn<= (regWriteEnable) ? 1 : 0;
             if (branch == 1) begin
                 branch <=2;
