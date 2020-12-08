@@ -113,7 +113,7 @@ int main(int argc, char**argv){
                 }else if(line[0] == "sll" || line[0] =="srl" || line[0] == "sra"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
                     binTrans = binTrans + bitset<5>(0).to_string() + regTrans(line[1],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist) + tobin5(line[3])+ registerMap.at(line[0]);
-                }else if (line[0] == "sllv" || line[0] =="slrv"){
+                }else if (line[0] == "sllv" || line[0] =="srlv" || line[0] == "srav"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
                     binTrans = binTrans + regTrans(line[3],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist)+ regTrans(line[1],lineNum, registerlist) + bitset<5>(0).to_string() + registerMap.at(line[0]);
                 }else{
