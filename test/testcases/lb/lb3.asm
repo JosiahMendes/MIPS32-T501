@@ -1,0 +1,6 @@
+addiu v1 v1 0xbfc0
+sll v1 v1 16
+jr r0
+lb v0 0x20(v1)
+data:
+0xbfc00020 0xFF
