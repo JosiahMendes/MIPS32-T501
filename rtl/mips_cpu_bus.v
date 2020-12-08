@@ -218,6 +218,8 @@ module mips_cpu_bus(
             PC <= 32'hBFC00000;
             active<=1;
             branch <=0;
+            HI <= 0;
+            LO <= 0;
         end
         if (state==INSTR_FETCH) begin
             $display("-------------------------------------------------------------------------------------------------------------PC = %h",PC);
@@ -346,6 +348,13 @@ module mips_cpu_bus(
                             MultSign <=0;
                         end
 
+                        FUNC_MTHI: begin
+                            ALUop <= ALU_ADD;
+                        end
+                        FUNC_MTLO: begin
+                            ALUop <= ALU_ADD;
+                        end
+
                     endcase
                 end
             endcase
@@ -356,7 +365,7 @@ module mips_cpu_bus(
             //Done
         end
         if (state==WRITE_BACK) begin
-            $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d..., HI = %h, L) = %h" ,readdata, ALUOut, I_instr_rt, HI, LO);
+            $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d..., HI = %h, LO = %h" ,readdata, ALUOut, I_instr_rt, HI, LO);
             state <= INSTR_FETCH;
             regDest <= (instr_opcode == OPCODE_JAL || (instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR && R_instr_rd == 0)) ? 5'd31
                         :(instr_opcode == OPCODE_R) ? R_instr_rd
@@ -374,6 +383,10 @@ module mips_cpu_bus(
             if(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MULT || R_instr_func == FUNC_MULTU)) begin
                 HI <= MultOut[63:32];
                 LO <= MultOut[31:0];
+            end else if(instr_opcode == OPCODE_R && R_instr_func == FUNC_MTHI)  begin
+                HI <= ALUOut;
+            end else if(instr_opcode == OPCODE_R && R_instr_func == FUNC_MTLO)  begin
+                LO <= ALUOut;
             end
             if (branch == 1) begin
                 branch <=2;
