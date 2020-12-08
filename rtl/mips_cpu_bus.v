@@ -194,6 +194,7 @@ module mips_cpu_bus(
                     ) ? 1 : 0;
     assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW || instr_opcode == OPCODE_SW))) ? 4'b1111 
                         : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? 4'b0001
+                        : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH)) ? 4'b0011
                         : 4'b0000;//TODO Temp
     assign write =  (state == MEM &&    (instr_opcode == OPCODE_SW || instr_opcode == OPCODE_SB
                                         ||instr_opcode == OPCODE_SH)
@@ -258,11 +259,26 @@ module mips_cpu_bus(
                 OPCODE_LB: begin
                     ALUop <= ALU_ADD;
                 end
+                OPCODE_LBU: begin
+                    ALUop <= ALU_ADD;
+                end
+                OPCODE_LH: begin
+                    ALUop <= ALU_ADD;
+                end
+                OPCODE_LHU: begin
+                    ALUop <= ALU_ADD;
+                end
                 OPCODE_LUI: begin
                     ALUop <=ALU_LUI;
                 end
 
                 OPCODE_SW: begin
+                    ALUop <= ALU_ADD;
+                end
+                OPCODE_SH: begin
+                    ALUop <= ALU_ADD;
+                end
+                OPCODE_SB: begin
                     ALUop <= ALU_ADD;
                 end
                 OPCODE_R: begin
@@ -315,15 +331,15 @@ module mips_cpu_bus(
             endcase
         end
         if (state==MEM) begin
-            $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d",ALUOut, regRdDataB,write, read );
+            $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b",ALUOut, regRdDataB,write, read, byteenable);
             state <= WRITE_BACK;
             //Done
         end
         if (state==WRITE_BACK) begin
-            $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d... %d" ,readdata, ALUOut, I_instr_rt, instr_opcode);
+            $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d... " ,readdata, ALUOut, I_instr_rt);
             state <= INSTR_FETCH;
             regDest <= (instr_opcode == OPCODE_R) ? R_instr_rd: I_instr_rt;
-            regDestData <= (instr_opcode == OPCODE_LB)    ? {{24{readdata[7]}},readdata[7:0]} 
+            regDestData <=  (instr_opcode == OPCODE_LB)   ? {{24{readdata[7]}},readdata[7:0]} 
                             :(instr_opcode == OPCODE_LBU) ? {{24'd0,readdata[7:0]}}
                             :(instr_opcode == OPCODE_LH)  ? {{16{readdata[15]}},readdata[15:0]}
                             :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}} 

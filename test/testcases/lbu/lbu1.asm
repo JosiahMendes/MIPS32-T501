@@ -1,5 +1,4 @@
-addiu v1 v1 0xbfc0
-sll v1 v1 16
+lui v1 0xbfc0
 jr r0
 lbu v0 0x20(v1)
 data:
