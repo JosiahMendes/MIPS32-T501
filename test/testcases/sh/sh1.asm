@@ -1,0 +1,5 @@
+addiu t0 r0 0xffaf
+lui v1 0xbfc0
+sh t0 0x20(v1)
+jr r0
+lw v0 0x20(v1)
