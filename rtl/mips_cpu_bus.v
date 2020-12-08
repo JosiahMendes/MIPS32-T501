@@ -179,6 +179,10 @@ module mips_cpu_bus(
     logic ALUSrc;
     assign ALUSrc = (instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL)? 0:1;
 
+    //Multiplier Connections
+    logic [63:0] MultOut;
+    logic MultSign;
+
     //Sign Extender
     logic [15:0] unextended;
     logic [31:0] extended;
@@ -335,6 +339,12 @@ module mips_cpu_bus(
                         FUNC_OR: begin
                             ALUop <= ALU_OR;
                         end
+                        FUNC_MULT: begin
+                            MultSign <=1;
+                        end
+                        FUNC_MULTU: begin
+                            MultSign <=0;
+                        end
                     endcase
                 end
             endcase
@@ -358,6 +368,8 @@ module mips_cpu_bus(
                             :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR)) ? PC+8
                             :ALUOut;
             regWriteEn<= (regWriteEnable) ? 1 : 0;
+            HI <= MultOut[63:32];
+            LO <= MultOut[31:0];
             if (branch == 1) begin
                 branch <=2;
                 PC <= PC_increment;
@@ -385,6 +397,9 @@ module mips_cpu_bus(
     mips_cpu_ALU ALUInst(
         .op(ALUop), .a(ALUInA), .b(ALUInB),
         .result(ALUOut), .zero(ALUZero), .sa(R_instr_shamt)
+    );
+    mips_cpu_multiplier MultInst(
+        .a(ALUInA), .b(ALUInB), .out(MultOut), .sign(MultSign)
     );
 
 endmodule

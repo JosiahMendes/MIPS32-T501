@@ -1,4 +1,4 @@
-lw v0 0x14
-lw v1 0x0
+addiu v0 r0 0x2
+addiu v1 r0 0xFFFF
 mult v0 v1
 jr r0
