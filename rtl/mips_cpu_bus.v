@@ -345,17 +345,18 @@ module mips_cpu_bus(
                         FUNC_MULTU: begin
                             MultSign <=0;
                         end
+
                     endcase
                 end
             endcase
         end
         if (state==MEM) begin
-            $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b",ALUOut, regRdDataB,write, read, byteenable);
+            $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b, Mult = %h",ALUOut, regRdDataB,write, read, byteenable, MultOut);
             state <= WRITE_BACK;
             //Done
         end
         if (state==WRITE_BACK) begin
-            $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d... " ,readdata, ALUOut, I_instr_rt);
+            $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d..., HI = %h, L) = %h" ,readdata, ALUOut, I_instr_rt, HI, LO);
             state <= INSTR_FETCH;
             regDest <= (instr_opcode == OPCODE_JAL || (instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR && R_instr_rd == 0)) ? 5'd31
                         :(instr_opcode == OPCODE_R) ? R_instr_rd
@@ -366,10 +367,14 @@ module mips_cpu_bus(
                             :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}} 
                             :(instr_opcode == OPCODE_LW)  ? readdata
                             :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR)) ? PC+8
+                            :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFHI) ? HI
+                            :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFLO) ? LO
                             :ALUOut;
             regWriteEn<= (regWriteEnable) ? 1 : 0;
-            HI <= MultOut[63:32];
-            LO <= MultOut[31:0];
+            if(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MULT || R_instr_func == FUNC_MULTU)) begin
+                HI <= MultOut[63:32];
+                LO <= MultOut[31:0];
+            end
             if (branch == 1) begin
                 branch <=2;
                 PC <= PC_increment;
