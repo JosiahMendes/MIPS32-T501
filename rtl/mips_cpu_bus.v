@@ -347,15 +347,15 @@ module mips_cpu_bus(
         if (state==WRITE_BACK) begin
             $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d... " ,readdata, ALUOut, I_instr_rt);
             state <= INSTR_FETCH;
-            regDest <= (instr_opcode == OPCODE_R) ? R_instr_rd
-                        :(instr_opcode == OPCODE_JAL) ? 5'd31
+            regDest <= (instr_opcode == OPCODE_JAL || (instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR && R_instr_rd == 0)) ? 5'd31
+                        :(instr_opcode == OPCODE_R) ? R_instr_rd
                         :I_instr_rt;
             regDestData <=  (instr_opcode == OPCODE_LB)   ? {{24{readdata[7]}},readdata[7:0]} 
                             :(instr_opcode == OPCODE_LBU) ? {{24'd0,readdata[7:0]}}
                             :(instr_opcode == OPCODE_LH)  ? {{16{readdata[15]}},readdata[15:0]}
                             :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}} 
                             :(instr_opcode == OPCODE_LW)  ? readdata
-                            :(instr_opcode == OPCODE_JAL) ? PC+8
+                            :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR)) ? PC+8
                             :ALUOut;
             regWriteEn<= (regWriteEnable) ? 1 : 0;
             if (branch == 1) begin

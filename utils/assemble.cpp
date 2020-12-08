@@ -105,8 +105,9 @@ int main(int argc, char**argv){
                     if (line.size()!=2){invalidInstruction(lineNum);}
                     binTrans = binTrans + regTrans(line[1],lineNum, registerlist)+ bitset<15>(0).to_string() + registerMap.at(line[0]);
                 }else if(line[0] == "jalr"){
-                    if (line.size()!=3){invalidInstruction(lineNum);}
-                    binTrans = binTrans + regTrans(line[1],lineNum, registerlist) + bitset<5>(0).to_string() + regTrans(line[2],lineNum, registerlist)+ bitset<5>(0).to_string() + registerMap.at(line[0]);
+                    if (!(line.size() ==3||line.size() ==2)){invalidInstruction(lineNum);}
+                    if(line.size() == 3){binTrans = binTrans + regTrans(line[2],lineNum, registerlist) + bitset<5>(0).to_string() + regTrans(line[1],lineNum, registerlist)+ bitset<5>(0).to_string() + registerMap.at(line[0]);}
+                    else if(line.size() == 2){binTrans = binTrans + regTrans(line[1],lineNum, registerlist) + bitset<15>(0).to_string() + registerMap.at(line[0]);}
                 }else if (line[0] == "mult" ||line[0] == "multu" || line[0] == "div" ||line[0] == "divu"){
                     if (line.size()!=3){invalidInstruction(lineNum);}
                     binTrans = binTrans + regTrans(line[1],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist) + bitset<10>(0).to_string()+registerMap.at(line[0]);
