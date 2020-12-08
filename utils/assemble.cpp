@@ -389,7 +389,7 @@ unordered_map<string,string> immDefine(){
     umap["lb"]    = "100000";
     umap["lbu"]   = "100100";
     umap["lh"]    = "100001";
-    umap["lhu"]   = "100100";
+    umap["lhu"]   = "100101";
     umap["lui"]   = "001111";
     umap["lw"]    = "100011";
     umap["lwl"]   = "100010";
