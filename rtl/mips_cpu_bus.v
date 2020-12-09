@@ -364,6 +364,9 @@ module mips_cpu_bus(
                         FUNC_SLT: begin
                             ALUop <= ALU_SLT;
                         end
+                        FUNC_SLTU: begin
+                            ALUop <= ALU_SLTU;
+                        end
                     endcase
                 end
             endcase
