@@ -287,7 +287,9 @@ module mips_cpu_bus(
                 OPCODE_SB: begin
                     ALUop <= ALU_ADD;
                 end
-
+                OPCODE_SLTI: begin
+                    ALUop <= ALU_SLT;
+                end
                 OPCODE_J :begin
                     branch <= 1;
                     PC_temp <= {PC[31:28],J_instr_addr, 2'd0};
