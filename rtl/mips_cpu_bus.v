@@ -162,14 +162,14 @@ module mips_cpu_bus(
                             ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LH
                             ||instr_opcode == OPCODE_LB) ? 1 :0;
 
-    assign regWriteEnable = !(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MTLO ||R_instr_func == FUNC_MTHI 
-                                                        ||R_instr_func == FUNC_JR ||R_instr_func == FUNC_MULT 
-                                                        ||R_instr_func == FUNC_MULTU ||R_instr_func == FUNC_DIV 
-                                                        ||R_instr_func == FUNC_DIVU ) 
-                                                        || instr_opcode == 6'b000001 || instr_opcode == OPCODE_J 
-                                                        || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE 
-                                                        || instr_opcode == OPCODE_BLEZ ||  instr_opcode == OPCODE_BGTZ 
-                                                        || instr_opcode == OPCODE_SB || instr_opcode == OPCODE_SH 
+    assign regWriteEnable = !(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MTLO ||R_instr_func == FUNC_MTHI
+                                                        ||R_instr_func == FUNC_JR ||R_instr_func == FUNC_MULT
+                                                        ||R_instr_func == FUNC_MULTU ||R_instr_func == FUNC_DIV
+                                                        ||R_instr_func == FUNC_DIVU )
+                                                        || instr_opcode == 6'b000001 || instr_opcode == OPCODE_J
+                                                        || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE
+                                                        || instr_opcode == OPCODE_BLEZ ||  instr_opcode == OPCODE_BGTZ
+                                                        || instr_opcode == OPCODE_SB || instr_opcode == OPCODE_SH
                                                         || instr_opcode == OPCODE_SW);
 
     //ALU Connections
@@ -190,13 +190,13 @@ module mips_cpu_bus(
 
     //Memory Control
     assign address = (state == INSTR_FETCH) ? PC : ALUOut;
-    assign read =   (state==INSTR_FETCH || (state == MEM && 
+    assign read =   (state==INSTR_FETCH || (state == MEM &&
                                         (instr_opcode == OPCODE_LWR||instr_opcode == OPCODE_LHU
                                         ||instr_opcode == OPCODE_LBU||instr_opcode == OPCODE_LW
                                         ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LH
                                         ||instr_opcode == OPCODE_LB))
                     ) ? 1 : 0;
-    assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW || instr_opcode == OPCODE_SW))) ? 4'b1111 
+    assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW || instr_opcode == OPCODE_SW))) ? 4'b1111
                         : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? 4'b0001
                         : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH)) ? 4'b0011
                         : 4'b0000;//TODO Temp
@@ -354,7 +354,9 @@ module mips_cpu_bus(
                         FUNC_MTLO: begin
                             ALUop <= ALU_ADD;
                         end
-
+                        FUNC_SLT: begin
+                            ALUop <= ALU_SLT;
+                        end
                     endcase
                 end
             endcase
@@ -370,10 +372,10 @@ module mips_cpu_bus(
             regDest <= (instr_opcode == OPCODE_JAL || (instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR && R_instr_rd == 0)) ? 5'd31
                         :(instr_opcode == OPCODE_R) ? R_instr_rd
                         :I_instr_rt;
-            regDestData <=  (instr_opcode == OPCODE_LB)   ? {{24{readdata[7]}},readdata[7:0]} 
+            regDestData <=  (instr_opcode == OPCODE_LB)   ? {{24{readdata[7]}},readdata[7:0]}
                             :(instr_opcode == OPCODE_LBU) ? {{24'd0,readdata[7:0]}}
                             :(instr_opcode == OPCODE_LH)  ? {{16{readdata[15]}},readdata[15:0]}
-                            :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}} 
+                            :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}}
                             :(instr_opcode == OPCODE_LW)  ? readdata
                             :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR)) ? PC+8
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFHI) ? HI

@@ -10,12 +10,10 @@ module mips_cpu_ALU (
   timeunit 1ns / 10ps;
 
   logic [4:0] sav;
-  logic signed [31:0] sra_var;
   logic [15:0] lower;
 
   assign zero = (result == 0);
   assign sav = (op==9 || op==10 || op==11) ? a[4:0] : 0;
-  assign sra_var = b;
   assign lower = b[15:0];
 
 
@@ -25,14 +23,14 @@ module mips_cpu_ALU (
       1: begin result = a | b; end //bitwise OR
       2: begin result = a + b; end //add
       3: begin result = a - b; end //sub
-      4: begin result = a < b ? 1 : 0; end //slt
+      4: begin result = $signed(a) < $signed(b) ? 1 : 0; end //slt
       5: begin result = a ^ b; end //bitwise XOR
       6: begin result = b << sa; end//shift left
       7: begin result = b >> sa; end //shift right
-      8: begin result = sra_var >>> sa; end //arithmetic shift right
+      8: begin result = $signed(b) >>> sa; end //arithmetic shift right
       9: begin result = b << sav; end //shift left variable
       10: begin result = b >> sav; end //shift right variable
-      11: begin result = sra_var >>> sav; end //arithmetic shift right variable
+      11: begin result = $signed(b) >>> sav; end //arithmetic shift right variable
       12: begin result = {lower,16'd0}; end
 
     endcase
