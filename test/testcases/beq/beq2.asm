@@ -1,0 +1,6 @@
+addiu $8 $0 0x123
+addiu $9 $0 0x122
+beq $8 $9 0x2
+addiu $2 $0 0x1
+jr $0
+addiu $2 $2 0x1
