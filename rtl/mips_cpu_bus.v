@@ -58,6 +58,7 @@ module mips_cpu_bus(
         //OPCODE_BLTZAL = 6'b000001,//TODO
         OPCODE_BNE    = 6'b000101,//TODO
         OPCODE_SLTI   = 6'b001010,//TODO
+        OPCODE_SLTIU = 6'b001011,
 
         OPCODE_LB     = 6'b100000,//TODO
         OPCODE_LBU    = 6'b100100,//TODO
@@ -133,7 +134,8 @@ module mips_cpu_bus(
         ALU_SLLV = 5'd9,
         ALU_SRLV = 5'd10,
         ALU_SRAV = 5'd11,
-        ALU_LUI  = 5'd12
+        ALU_LUI  = 5'd12,
+        ALU_SLTU = 5'd13
     }aluop_t;
 
     // Statemachine -> MIPS uses a maximum of 5 states. Starting off with decimal state indexes (0-4)
@@ -244,7 +246,7 @@ module mips_cpu_bus(
             $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h      shiftamount", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate,R_instr_shamt);
             state <= MEM;
             ALUInA <= regRdDataA;
-            ALUInB <= (ALUSrc) ? {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
+            ALUInB <= (ALUSrc) ? (instr_opcode == OPCODE_SLTIU) ? {16'b0, I_instr_immediate} : {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
             case (instr_opcode)//Add case statements
                 OPCODE_ADDIU: begin
                     ALUop <= ALU_ADD;
@@ -289,6 +291,9 @@ module mips_cpu_bus(
                 end
                 OPCODE_SLTI: begin
                     ALUop <= ALU_SLT;
+                end
+                OPCODE_SLTIU: begin
+                    ALUop <= ALU_SLTU;
                 end
                 OPCODE_J :begin
                     branch <= 1;
