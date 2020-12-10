@@ -58,22 +58,23 @@ module mips_cpu_bus(
         //OPCODE_BLTZAL = 6'b000001,//TODO
         OPCODE_BNE    = 6'b000101,//TODO
         OPCODE_SLTI   = 6'b001010,//TODO
+        OPCODE_SLTIU = 6'b001011,
 
-        OPCODE_LB     = 6'b100000,//TODO
-        OPCODE_LBU    = 6'b100100,//TODO
-        OPCODE_LHU    = 6'b100101,//TODO
+        OPCODE_LB     = 6'b100000,
+        OPCODE_LBU    = 6'b100100,
+        OPCODE_LHU    = 6'b100101,
         OPCODE_LH     = 6'b100001,
-        OPCODE_LUI    = 6'b001111,//TODO
-        OPCODE_LW     = 6'b100011,//TODO
+        OPCODE_LUI    = 6'b001111,
+        OPCODE_LW     = 6'b100011,
         OPCODE_LWL    = 6'b100010,//TODO
         OPCODE_LWR    = 6'b100110,//TODO
 
-        OPCODE_SB     = 6'b101000,//TODO
-        OPCODE_SH     = 6'b101001,//TODO
-        OPCODE_SW     = 6'b101011,//TODO
+        OPCODE_SB     = 6'b101000,
+        OPCODE_SH     = 6'b101001,
+        OPCODE_SW     = 6'b101011,
 
-        OPCODE_J      = 6'b000010,//TODO
-        OPCODE_JAL    = 6'b000011,//TODO
+        OPCODE_J      = 6'b000010,
+        OPCODE_JAL    = 6'b000011,
 
         OPCODE_R    = 6'b000000
 
@@ -81,7 +82,7 @@ module mips_cpu_bus(
 
     typedef enum logic[5:0] {
         FUNC_JR = 6'b001000,
-        FUNC_JALR = 6'b001001,//TODO
+        FUNC_JALR = 6'b001001,
 
         FUNC_ADDU = 6'b100001,
         FUNC_SUBU = 6'b100011,
@@ -91,13 +92,13 @@ module mips_cpu_bus(
 
         FUNC_DIV  = 6'b011010,//TODO
         FUNC_DIVU = 6'b011011,//TODO
-        FUNC_MULT = 6'b011000,//TODO
-        FUNC_MULTU= 6'b011001,//TODO
+        FUNC_MULT = 6'b011000,
+        FUNC_MULTU= 6'b011001,
 
-        FUNC_MFHI = 6'b010000,//TODO
-        FUNC_MFLO = 6'b010010,//TODO
-        FUNC_MTHI = 6'b010001,//TODO
-        FUNC_MTLO = 6'b010011,//TODO
+        FUNC_MFHI = 6'b010000,
+        FUNC_MFLO = 6'b010010,
+        FUNC_MTHI = 6'b010001,
+        FUNC_MTLO = 6'b010011,
 
         FUNC_SLT  = 6'b101010,//TODO
         FUNC_SLTU = 6'b101011,//TODO
@@ -133,7 +134,8 @@ module mips_cpu_bus(
         ALU_SLLV = 5'd9,
         ALU_SRLV = 5'd10,
         ALU_SRAV = 5'd11,
-        ALU_LUI  = 5'd12
+        ALU_LUI  = 5'd12,
+        ALU_SLTU = 5'd13
     }aluop_t;
 
     // Statemachine -> MIPS uses a maximum of 5 states. Starting off with decimal state indexes (0-4)
@@ -162,14 +164,14 @@ module mips_cpu_bus(
                             ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LH
                             ||instr_opcode == OPCODE_LB) ? 1 :0;
 
-    assign regWriteEnable = !(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MTLO ||R_instr_func == FUNC_MTHI 
-                                                        ||R_instr_func == FUNC_JR ||R_instr_func == FUNC_MULT 
-                                                        ||R_instr_func == FUNC_MULTU ||R_instr_func == FUNC_DIV 
-                                                        ||R_instr_func == FUNC_DIVU ) 
-                                                        || instr_opcode == 6'b000001 || instr_opcode == OPCODE_J 
-                                                        || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE 
-                                                        || instr_opcode == OPCODE_BLEZ ||  instr_opcode == OPCODE_BGTZ 
-                                                        || instr_opcode == OPCODE_SB || instr_opcode == OPCODE_SH 
+    assign regWriteEnable = !(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MTLO ||R_instr_func == FUNC_MTHI
+                                                        ||R_instr_func == FUNC_JR ||R_instr_func == FUNC_MULT
+                                                        ||R_instr_func == FUNC_MULTU ||R_instr_func == FUNC_DIV
+                                                        ||R_instr_func == FUNC_DIVU )
+                                                        || instr_opcode == 6'b000001 || instr_opcode == OPCODE_J
+                                                        || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE
+                                                        || instr_opcode == OPCODE_BLEZ ||  instr_opcode == OPCODE_BGTZ
+                                                        || instr_opcode == OPCODE_SB || instr_opcode == OPCODE_SH
                                                         || instr_opcode == OPCODE_SW);
 
     //ALU Connections
@@ -190,13 +192,13 @@ module mips_cpu_bus(
 
     //Memory Control
     assign address = (state == INSTR_FETCH) ? PC : ALUOut;
-    assign read =   (state==INSTR_FETCH || (state == MEM && 
+    assign read =   (state==INSTR_FETCH || (state == MEM &&
                                         (instr_opcode == OPCODE_LWR||instr_opcode == OPCODE_LHU
                                         ||instr_opcode == OPCODE_LBU||instr_opcode == OPCODE_LW
                                         ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LH
                                         ||instr_opcode == OPCODE_LB))
                     ) ? 1 : 0;
-    assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW || instr_opcode == OPCODE_SW))) ? 4'b1111 
+    assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW || instr_opcode == OPCODE_SW))) ? 4'b1111
                         : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? 4'b0001
                         : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH)) ? 4'b0011
                         : 4'b0000;//TODO Temp
@@ -227,6 +229,7 @@ module mips_cpu_bus(
             //state<=INSTR_DECODE;
             if(address == 32'h00000000) begin
                 active <= 0; state<=HALTED;
+            end else if(waitrequest) begin
             end else begin state<=INSTR_DECODE; end
             regReset <= 0;
             regWriteEn<=0;
@@ -244,7 +247,7 @@ module mips_cpu_bus(
             $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h      shiftamount", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate,R_instr_shamt);
             state <= MEM;
             ALUInA <= regRdDataA;
-            ALUInB <= (ALUSrc) ? {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
+            ALUInB <= (ALUSrc) ? (instr_opcode == OPCODE_SLTIU || instr_opcode == OPCODE_ORI ||  instr_opcode == OPCODE_XORI || instr_opcode == OPCODE_ANDI) ? {16'b0, I_instr_immediate} : {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
             case (instr_opcode)//Add case statements
                 OPCODE_ADDIU: begin
                     ALUop <= ALU_ADD;
@@ -287,7 +290,12 @@ module mips_cpu_bus(
                 OPCODE_SB: begin
                     ALUop <= ALU_ADD;
                 end
-
+                OPCODE_SLTI: begin
+                    ALUop <= ALU_SLT;
+                end
+                OPCODE_SLTIU: begin
+                    ALUop <= ALU_SLTU;
+                end
                 OPCODE_J :begin
                     branch <= 1;
                     PC_temp <= {PC[31:28],J_instr_addr, 2'd0};
@@ -354,14 +362,20 @@ module mips_cpu_bus(
                         FUNC_MTLO: begin
                             ALUop <= ALU_ADD;
                         end
-
+                        FUNC_SLT: begin
+                            ALUop <= ALU_SLT;
+                        end
+                        FUNC_SLTU: begin
+                            ALUop <= ALU_SLTU;
+                        end
                     endcase
                 end
             endcase
         end
         if (state==MEM) begin
             $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b, Mult = %h",ALUOut, regRdDataB,write, read, byteenable, MultOut);
-            state <= WRITE_BACK;
+            if (waitrequest) begin end
+            else begin state <= WRITE_BACK; end
             //Done
         end
         if (state==WRITE_BACK) begin
@@ -370,10 +384,10 @@ module mips_cpu_bus(
             regDest <= (instr_opcode == OPCODE_JAL || (instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR && R_instr_rd == 0)) ? 5'd31
                         :(instr_opcode == OPCODE_R) ? R_instr_rd
                         :I_instr_rt;
-            regDestData <=  (instr_opcode == OPCODE_LB)   ? {{24{readdata[7]}},readdata[7:0]} 
+            regDestData <=  (instr_opcode == OPCODE_LB)   ? {{24{readdata[7]}},readdata[7:0]}
                             :(instr_opcode == OPCODE_LBU) ? {{24'd0,readdata[7:0]}}
                             :(instr_opcode == OPCODE_LH)  ? {{16{readdata[15]}},readdata[15:0]}
-                            :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}} 
+                            :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}}
                             :(instr_opcode == OPCODE_LW)  ? readdata
                             :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR)) ? PC+8
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFHI) ? HI
