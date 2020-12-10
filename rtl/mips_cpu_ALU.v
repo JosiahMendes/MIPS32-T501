@@ -33,6 +33,8 @@ module mips_cpu_ALU (
       11: begin result = $signed(b) >>> sav; end //arithmetic shift right variable
       12: begin result = {lower,16'd0}; end
       13: begin result = $unsigned(a) < $unsigned(b) ? 1 : 0; end//sltu
+      14: begin result = a; end//a
+      15: begin result = b; end //b
 
     endcase
   end
