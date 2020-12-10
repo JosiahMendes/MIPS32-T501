@@ -60,21 +60,21 @@ module mips_cpu_bus(
         OPCODE_SLTI   = 6'b001010,//TODO
         OPCODE_SLTIU = 6'b001011,
 
-        OPCODE_LB     = 6'b100000,//TODO
-        OPCODE_LBU    = 6'b100100,//TODO
-        OPCODE_LHU    = 6'b100101,//TODO
+        OPCODE_LB     = 6'b100000,
+        OPCODE_LBU    = 6'b100100,
+        OPCODE_LHU    = 6'b100101,
         OPCODE_LH     = 6'b100001,
-        OPCODE_LUI    = 6'b001111,//TODO
-        OPCODE_LW     = 6'b100011,//TODO
+        OPCODE_LUI    = 6'b001111,
+        OPCODE_LW     = 6'b100011,
         OPCODE_LWL    = 6'b100010,//TODO
         OPCODE_LWR    = 6'b100110,//TODO
 
-        OPCODE_SB     = 6'b101000,//TODO
-        OPCODE_SH     = 6'b101001,//TODO
-        OPCODE_SW     = 6'b101011,//TODO
+        OPCODE_SB     = 6'b101000,
+        OPCODE_SH     = 6'b101001,
+        OPCODE_SW     = 6'b101011,
 
-        OPCODE_J      = 6'b000010,//TODO
-        OPCODE_JAL    = 6'b000011,//TODO
+        OPCODE_J      = 6'b000010,
+        OPCODE_JAL    = 6'b000011,
 
         OPCODE_R    = 6'b000000
 
@@ -82,7 +82,7 @@ module mips_cpu_bus(
 
     typedef enum logic[5:0] {
         FUNC_JR = 6'b001000,
-        FUNC_JALR = 6'b001001,//TODO
+        FUNC_JALR = 6'b001001,
 
         FUNC_ADDU = 6'b100001,
         FUNC_SUBU = 6'b100011,
@@ -92,13 +92,13 @@ module mips_cpu_bus(
 
         FUNC_DIV  = 6'b011010,//TODO
         FUNC_DIVU = 6'b011011,//TODO
-        FUNC_MULT = 6'b011000,//TODO
-        FUNC_MULTU= 6'b011001,//TODO
+        FUNC_MULT = 6'b011000,
+        FUNC_MULTU= 6'b011001,
 
-        FUNC_MFHI = 6'b010000,//TODO
-        FUNC_MFLO = 6'b010010,//TODO
-        FUNC_MTHI = 6'b010001,//TODO
-        FUNC_MTLO = 6'b010011,//TODO
+        FUNC_MFHI = 6'b010000,
+        FUNC_MFLO = 6'b010010,
+        FUNC_MTHI = 6'b010001,
+        FUNC_MTLO = 6'b010011,
 
         FUNC_SLT  = 6'b101010,//TODO
         FUNC_SLTU = 6'b101011,//TODO
@@ -229,6 +229,7 @@ module mips_cpu_bus(
             //state<=INSTR_DECODE;
             if(address == 32'h00000000) begin
                 active <= 0; state<=HALTED;
+            end else if(waitrequest) begin 
             end else begin state<=INSTR_DECODE; end
             regReset <= 0;
             regWriteEn<=0;
@@ -373,7 +374,8 @@ module mips_cpu_bus(
         end
         if (state==MEM) begin
             $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b, Mult = %h",ALUOut, regRdDataB,write, read, byteenable, MultOut);
-            state <= WRITE_BACK;
+            if (waitrequest) begin end
+            else begin state <= WRITE_BACK; end
             //Done
         end
         if (state==WRITE_BACK) begin
