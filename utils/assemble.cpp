@@ -140,7 +140,7 @@ int main(int argc, char**argv){
                 }else if(line[0] == "bne" || line[0] == "beq"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
                     binTrans = immediateMap.at(line[0]) + regTrans(line[1],lineNum, registerlist) + regTrans(line[2],lineNum, registerlist) + tobin16(line[3]);
-                } else if (line[0] == "addiu" || line[0] == "andiu" ||line[0] == "ori" ||line[0] == "xori"||line[0] == "slti"||line[0] == "sltiu"){
+                } else if (line[0] == "addiu" || line[0] == "andi" ||line[0] == "ori" ||line[0] == "xori"||line[0] == "slti"||line[0] == "sltiu"){
                     if (line.size()!=4){invalidInstruction(lineNum);}
                     binTrans = immediateMap.at(line[0]) + regTrans(line[2],lineNum, registerlist) + regTrans(line[1],lineNum, registerlist) + tobin16(line[3]);
                 } else{

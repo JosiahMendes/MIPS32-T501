@@ -229,7 +229,7 @@ module mips_cpu_bus(
             //state<=INSTR_DECODE;
             if(address == 32'h00000000) begin
                 active <= 0; state<=HALTED;
-            end else if(waitrequest) begin 
+            end else if(waitrequest) begin
             end else begin state<=INSTR_DECODE; end
             regReset <= 0;
             regWriteEn<=0;
@@ -247,7 +247,7 @@ module mips_cpu_bus(
             $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h      shiftamount", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate,R_instr_shamt);
             state <= MEM;
             ALUInA <= regRdDataA;
-            ALUInB <= (ALUSrc) ? (instr_opcode == OPCODE_SLTIU) ? {16'b0, I_instr_immediate} : {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
+            ALUInB <= (ALUSrc) ? (instr_opcode == OPCODE_SLTIU || instr_opcode == OPCODE_ORI ||  instr_opcode == OPCODE_XORI || instr_opcode == OPCODE_ANDI) ? {16'b0, I_instr_immediate} : {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
             case (instr_opcode)//Add case statements
                 OPCODE_ADDIU: begin
                     ALUop <= ALU_ADD;
