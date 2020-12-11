@@ -56,7 +56,7 @@ module mips_cpu_bus(
         OPCODE_BGTZ   = 6'b000111,
         OPCODE_BNE    = 6'b000101,
         OPCODE_SLTI   = 6'b001010,
-        OPCODE_SLTIU = 6'b001011, //TODO
+        OPCODE_SLTIU = 6'b001011, 
 
         OPCODE_LB     = 6'b100000,
         OPCODE_LBU    = 6'b100100,
@@ -98,7 +98,7 @@ module mips_cpu_bus(
         FUNC_MTHI = 6'b010001,
         FUNC_MTLO = 6'b010011,
 
-        FUNC_SLT  = 6'b101010,//TODO
+        FUNC_SLT  = 6'b101010,
         FUNC_SLTU = 6'b101011,
 
         FUNC_SLL  = 6'b000000,
@@ -253,7 +253,7 @@ module mips_cpu_bus(
             $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h      shiftamount", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate,R_instr_shamt);
             state <= MEM;
             ALUInA <= regRdDataA;
-            ALUInB <= (ALUSrc) ? (instr_opcode == OPCODE_SLTIU || instr_opcode == OPCODE_ORI ||  instr_opcode == OPCODE_XORI || instr_opcode == OPCODE_ANDI) ? {16'b0, I_instr_immediate} : {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
+            ALUInB <= (ALUSrc) ? (instr_opcode == OPCODE_ORI ||  instr_opcode == OPCODE_XORI || instr_opcode == OPCODE_ANDI) ? {16'b0, I_instr_immediate} : {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
             case (instr_opcode)//Add case statements
                 OPCODE_ADDIU: begin
                     ALUop <= ALU_ADD;
