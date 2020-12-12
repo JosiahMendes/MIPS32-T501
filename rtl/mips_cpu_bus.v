@@ -174,11 +174,11 @@ module mips_cpu_bus(
                                                         ||R_instr_func == FUNC_JR ||R_instr_func == FUNC_MULT
                                                         ||R_instr_func == FUNC_MULTU ||R_instr_func == FUNC_DIV
                                                         ||R_instr_func == FUNC_DIVU )
-                                                        || (instr_opcode == OPCODE_REGIMM && (I_instr_rt == BGEZ || I_instr_rt == BLTZ)) || instr_opcode == OPCODE_J
-                                                        || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE
-                                                        || instr_opcode == OPCODE_BLEZ ||  instr_opcode == OPCODE_BGTZ
-                                                        || instr_opcode == OPCODE_SB || instr_opcode == OPCODE_SH
-                                                        || instr_opcode == OPCODE_SW);
+                            ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BGEZ || I_instr_rt == BLTZ)) || instr_opcode == OPCODE_J
+                            || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE|| instr_opcode == OPCODE_BLEZ ||  instr_opcode == OPCODE_BGTZ
+                            || instr_opcode == OPCODE_SB || instr_opcode == OPCODE_SH|| instr_opcode == OPCODE_SW
+                            || ((instr_opcode == OPCODE_LH||instr_opcode == OPCODE_LHU) &&  ALUOut[0] != 0) 
+                            || (instr_opcode == OPCODE_LW && !(ALUOut[0] == 0 && ALUOut[1] == 0)));
 
     //ALU Connections
     logic [4:0] ALUop;

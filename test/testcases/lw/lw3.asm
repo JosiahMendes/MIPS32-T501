@@ -1,3 +1,3 @@
 lui v1 0xbfc0
 jr r0
-lw v0 0x00(v1)
+lw v0 0x01(v1)
