@@ -184,8 +184,10 @@ module mips_cpu_bus(
     logic [4:0] ALUop;
     logic [31:0] ALUInA, ALUInB, ALUOut;
     logic ALUZero;
-    logic ALUSrc;
-    assign ALUSrc = (instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE || instr_opcode == OPCODE_REGIMM)? 0:1;
+    logic [2:0] ALUSrc;
+    assign ALUSrc = (instr_opcode == OPCODE_ORI ||  instr_opcode == OPCODE_XORI || instr_opcode == OPCODE_ANDI) ? 2'b00
+                    :(instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE || instr_opcode == OPCODE_REGIMM)? 2'b01 
+                    : 2'b11;
 
     //Multiplier Connections
     logic [63:0] MultOut;
@@ -199,10 +201,10 @@ module mips_cpu_bus(
     //Memory Control
     assign address = (state == INSTR_FETCH) ? PC : ALUOut;
     assign read =   (state==INSTR_FETCH || (state == MEM &&
-                                        (instr_opcode == OPCODE_LWR||instr_opcode == OPCODE_LHU
-                                        ||instr_opcode == OPCODE_LBU||instr_opcode == OPCODE_LW
-                                        ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LH
-                                        ||instr_opcode == OPCODE_LB))
+                                        (((instr_opcode == OPCODE_LH||instr_opcode == OPCODE_LHU) &&  ALUOut[0] == 0)
+                                        ||(instr_opcode == OPCODE_LW && ALUOut[0] == 0 && ALUOut[1] == 0)
+                                        ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LWR
+                                        ||instr_opcode == OPCODE_LB||instr_opcode == OPCODE_LBU))
                     ) ? 1 : 0;
     assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW || instr_opcode == OPCODE_SW))) ? 4'b1111
                         : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? 4'b0001
@@ -253,7 +255,8 @@ module mips_cpu_bus(
             $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h      shiftamount", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate,R_instr_shamt);
             state <= MEM;
             ALUInA <= regRdDataA;
-            ALUInB <= (ALUSrc) ? (instr_opcode == OPCODE_ORI ||  instr_opcode == OPCODE_XORI || instr_opcode == OPCODE_ANDI) ? {16'b0, I_instr_immediate} : {{16{I_instr_immediate[15]}}, I_instr_immediate} : regRdDataB;
+            
+            ALUInB <= (ALUSrc == 2'b00) ? {16'b0, I_instr_immediate} : (ALUSrc == 2'b11) ? {{16{I_instr_immediate[15]}}, I_instr_immediate} :regRdDataB;
             case (instr_opcode)//Add case statements
                 OPCODE_ADDIU: begin
                     ALUop <= ALU_ADD;
@@ -286,7 +289,6 @@ module mips_cpu_bus(
                 OPCODE_LUI: begin
                     ALUop <=ALU_LUI;
                 end
-
                 OPCODE_SW: begin
                     ALUop <= ALU_ADD;
                 end
@@ -439,7 +441,6 @@ module mips_cpu_bus(
                     PC_temp <= PC_increment + {{14{I_instr_immediate[15]}},I_instr_immediate, 2'd0};
                 end
             end
-            //Done
         end
         if (state==WRITE_BACK) begin
             $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d..., HI = %h, LO = %h" ,readdata, ALUOut, I_instr_rt, HI, LO);
