@@ -1,6 +1,6 @@
-lui v0 0x02F0
-lui v1 0x6382
+addiu v0 r0 0x1
+addiu v1 r0 0x6382
 multu v0 v1
-mflo v0
-jr r0
 mfhi v0
+jr r0
+mflo v0
