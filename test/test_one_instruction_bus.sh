@@ -18,7 +18,11 @@ if test -d "test/testcases/${INSTR}" ; then
         >&2 echo "    1 - Assembling input file"
 
         rm -f test/testcases/${INSTR}/${TESTNAME}_MEM.txt
-        rm -f test/testcases/${INSTR}/${TESTNAME}_MEM.stdout
+        rm -f test/testcases/*_MEM*
+        rm -f test/testcases/${INSTR}/${TESTNAME}.stdout
+
+        var=$(< test/testcases/${INSTR}/${TESTNAME}.ref)
+        fail="FAIL"
 
         utils/assembler test/testcases/${INSTR}/${TESTNAME}.asm hex littleEndian 1 > test/testcases/${INSTR}/${TESTNAME}_MEM.txt
 
@@ -49,7 +53,7 @@ if test -d "test/testcases/${INSTR}" ; then
         set -e
 
         #if it returned a failure code
-        if [[ "${RESULT}" -ne 0 ]] ; then
+        if [[ "${RESULT}" -ne 0 && "$var" != "$fail" ]] ; then
             echo "${TESTNAME} ${INSTR} Fail - Testbench Error"
             # rm test/testcases/${INSTR}/${TESTNAME}.stdout
             rm test/testcases/${INSTR}/${TESTNAME}
@@ -76,11 +80,13 @@ if test -d "test/testcases/${INSTR}" ; then
         RESULT=$?
         set -e
 
-        if [[ "${RESULT}" -ne 0 ]] ; then
+
+        if [[ "${RESULT}" -ne 0 && "$var" != "$fail" ]] ; then
             echo "  ${TESTNAME} ${INSTR} Fail - Doesn't Match Given Reference"
         else
             echo "  ${TESTNAME} ${INSTR} Pass"
             rm test/testcases/${INSTR}/${TESTNAME}.stdout
+            rm test/testcases/${INSTR}/${TESTNAME}_MEM.txt
         fi
         rm test/testcases/${INSTR}/${TESTNAME}
         rm test/testcases/${INSTR}/${TESTNAME}.out
