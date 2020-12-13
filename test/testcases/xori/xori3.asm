@@ -1,0 +1,3 @@
+xori $2 $0 0xFFFF
+jr $0
+sll $0 $0 0x0
