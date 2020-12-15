@@ -212,7 +212,7 @@ module mips_cpu_bus(
                                         ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LWR
                                         ||instr_opcode == OPCODE_LB||instr_opcode == OPCODE_LBU))
                     ) ? 1 : 0;
-    assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW || instr_opcode == OPCODE_SW))) ? 4'b1111
+    assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW ||  instr_opcode == OPCODE_LWL || instr_opcode == OPCODE_LWR ||instr_opcode == OPCODE_SW))) ? 4'b1111
                         : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? 4'b0001
                         : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH)) ? 4'b0011
                         : 4'b0000;//TODO Temp
@@ -297,6 +297,13 @@ module mips_cpu_bus(
                 OPCODE_LUI: begin
                     ALUop <=ALU_LUI;
                 end
+                OPCODE_LWL: begin
+                    ALUop <= ALU_ADD;
+                end
+                OPCODE_LWR: begin
+                    ALUop <= ALU_ADD;
+                end
+
                 OPCODE_SW: begin
                     ALUop <= ALU_ADD;
                 end
@@ -408,7 +415,7 @@ module mips_cpu_bus(
                             MultSign <=0;
                         end
 
-                        FUNC_DIV: begin
+                        FUNC_DIVU: begin
                             DivStart <= 1;
                         end
 
@@ -430,7 +437,7 @@ module mips_cpu_bus(
         end
         if (state==MEM) begin
             $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b, DivStart = %b, DivDone = %b",ALUOut, regRdDataB,write, read, byteenable, DivStart,DivDone);
-            if (waitrequest || (!DivDone && instr_opcode == OPCODE_R && R_instr_func == FUNC_DIV) ) begin 
+            if (waitrequest || (!DivDone && instr_opcode == OPCODE_R && R_instr_func == FUNC_DIVU) ) begin 
                 DivStart <=0;
             end
             else begin state <= WRITE_BACK; end
@@ -468,6 +475,7 @@ module mips_cpu_bus(
                             :(instr_opcode == OPCODE_LH)  ? {{16{readdata[15]}},readdata[15:0]}
                             :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}}
                             :(instr_opcode == OPCODE_LW)  ? readdata
+                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 0) ? 32'b1
                             :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL) && branch == 1))) ? PC+8
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFHI) ? HI
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFLO) ? LO
