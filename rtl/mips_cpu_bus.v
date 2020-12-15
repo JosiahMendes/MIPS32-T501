@@ -315,11 +315,11 @@ module mips_cpu_bus(
 
                 OPCODE_J :begin
                     branch <= 1;
-                    PC_temp <= {PC[31:28],J_instr_addr, 2'd0};
+                    PC_temp <= {PC_increment[31:28],J_instr_addr, 2'd0};
                 end
                 OPCODE_JAL: begin
                     branch <=1;
-                    PC_temp <= {PC[31:28],J_instr_addr, 2'd0};
+                    PC_temp <= {PC_increment[31:28],J_instr_addr, 2'd0};
                 end
 
                 OPCODE_BEQ: begin

@@ -16,7 +16,7 @@ module mips_cpu_divider
     logic [31:0] ac, ac_next;   // accumulator
     logic [5:0] i;   // dividend bit counter
 
-    always_comb begin
+    always@(*) begin
         if (ac >= y1) begin
             ac_next = ac - y1;
             {ac_next, q1_next} = {ac_next[30:0], q1, 1'b1};
