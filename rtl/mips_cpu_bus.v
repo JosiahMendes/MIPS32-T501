@@ -193,6 +193,12 @@ module mips_cpu_bus(
     logic [63:0] MultOut;
     logic MultSign;
 
+    //Divider Connections
+    logic [31:0] DivQuotient, DivRemainder;
+    logic DivStart, DivDone, DivDbz, DivReset;
+
+    //assign DivStart = (state == EXEC && instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU )) ? 1 :0;
+
     //Sign Extender
     logic [15:0] unextended;
     logic [31:0] extended;
@@ -230,6 +236,7 @@ module mips_cpu_bus(
             branch <=0;
             HI <= 0;
             LO <= 0;
+            DivReset <=1;
         end
         if (state==INSTR_FETCH) begin
             $display("-------------------------------------------------------------------------------------------------------------PC = %h",PC);
@@ -240,6 +247,7 @@ module mips_cpu_bus(
             end else if(waitrequest) begin
             end else begin state<=INSTR_DECODE; end
             regReset <= 0;
+            DivReset <=0;
             regWriteEn<=0;
         end
         if (state==INSTR_DECODE) begin
@@ -392,11 +400,16 @@ module mips_cpu_bus(
                         FUNC_OR: begin
                             ALUop <= ALU_OR;
                         end
+
                         FUNC_MULT: begin
                             MultSign <=1;
                         end
                         FUNC_MULTU: begin
                             MultSign <=0;
+                        end
+
+                        FUNC_DIV: begin
+                            DivStart <= 1;
                         end
 
                         FUNC_MTHI: begin
@@ -416,8 +429,10 @@ module mips_cpu_bus(
             endcase
         end
         if (state==MEM) begin
-            $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b, Mult = %h",ALUOut, regRdDataB,write, read, byteenable, MultOut);
-            if (waitrequest) begin end
+            $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b, DivStart = %b, DivDone = %b",ALUOut, regRdDataB,write, read, byteenable, DivStart,DivDone);
+            if (waitrequest || (!DivDone && instr_opcode == OPCODE_R && R_instr_func == FUNC_DIV) ) begin 
+                DivStart <=0;
+            end
             else begin state <= WRITE_BACK; end
 
             if(instr_opcode == OPCODE_BEQ && ALUZero) begin 
@@ -465,7 +480,10 @@ module mips_cpu_bus(
                 HI <= ALUOut;
             end else if(instr_opcode == OPCODE_R && R_instr_func == FUNC_MTLO)  begin
                 LO <= ALUOut;
-            end
+            end else if(instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU)) begin
+                HI <= DivRemainder;
+                LO <= DivQuotient;
+            end 
             if (branch == 1) begin
                 branch <=2;
                 PC <= PC_increment;
@@ -496,6 +514,9 @@ module mips_cpu_bus(
     );
     mips_cpu_multiplier MultInst(
         .a(ALUInA), .b(ALUInB), .out(MultOut), .sign(MultSign)
+    );
+    mips_cpu_divider DivInst(
+        .clk(clk), .start(DivStart),.Dividend(ALUInA), .Divisor(ALUInB), .Quotient(DivQuotient), .Remainder(DivRemainder), .done(DivDone), .dbz(DivDbz), .reset(DivReset)
     );
 
 endmodule

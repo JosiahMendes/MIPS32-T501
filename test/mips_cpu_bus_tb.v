@@ -35,6 +35,8 @@ module mips_cpu_bus_tb;
     // Generate clock
     initial begin
         $display("Simulation Starting");
+        $dumpfile("Simulation.vcd");
+        $dumpvars(0, mips_cpu_bus_tb);
         clk=0;
 
         repeat (TIMEOUT_CYCLES) begin
