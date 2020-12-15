@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eou pipefail
+#set -eou pipefail
 
 SRC="$1"
 #get a list of all the instructions

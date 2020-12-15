@@ -4,7 +4,7 @@ set -eou pipefail
 SRC="$1"
 INSTR="$2"
 
-g++ utils/assemble.cpp -o utils/assembler
+#g++ utils/assemble.cpp -o utils/assembler
 #check if testcases for instruction exist
 if test -d "test/testcases/${INSTR}" ; then
     #loop through every testcases available
