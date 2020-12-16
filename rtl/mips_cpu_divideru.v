@@ -37,7 +37,7 @@ module mips_cpu_divideru
                 done <= 1;
                 Quotient <= 0;
                 Remainder <= 0;
-            end if(Dividend == 0) begin
+            end else if(Dividend == 0) begin
                 done <= 1;
                 Quotient <= 0;
                 Remainder <= 0;

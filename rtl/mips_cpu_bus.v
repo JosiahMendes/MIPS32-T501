@@ -441,7 +441,7 @@ module mips_cpu_bus(
             endcase
         end
         if (state==MEM) begin
-            $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b, DivStart = %b, DivDone = %b",ALUOut, regRdDataB,write, read, byteenable, DivStart,DivDone);
+            $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b, DivDone = %b",ALUOut, regRdDataB,write, read, byteenable, DivDbz,DivDone);
             if (waitrequest || (!DivDone && instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIVU||R_instr_func == FUNC_DIV)) ) begin 
                 DivStart <=0;
             end
