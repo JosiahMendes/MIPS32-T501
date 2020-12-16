@@ -195,7 +195,9 @@ module mips_cpu_bus(
 
     //Divider Connections
     logic [31:0] DivQuotient, DivRemainder;
-    logic DivStart, DivDone, DivDbz, DivReset;
+    logic DivStart, DivDone, DivDbz, DivReset, DivSign;
+
+    assign DivSign = (instr_opcode == OPCODE_R && R_instr_func == FUNC_DIV) ? 1 :0;
 
     //assign DivStart = (state == EXEC && instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU )) ? 1 :0;
 
@@ -418,6 +420,9 @@ module mips_cpu_bus(
                         FUNC_DIVU: begin
                             DivStart <= 1;
                         end
+                        FUNC_DIV: begin
+                            DivStart <= 1;
+                        end
 
                         FUNC_MTHI: begin
                             ALUop <= ALU_ADD;
@@ -437,7 +442,7 @@ module mips_cpu_bus(
         end
         if (state==MEM) begin
             $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b, DivStart = %b, DivDone = %b",ALUOut, regRdDataB,write, read, byteenable, DivStart,DivDone);
-            if (waitrequest || (!DivDone && instr_opcode == OPCODE_R && R_instr_func == FUNC_DIVU) ) begin 
+            if (waitrequest || (!DivDone && instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIVU||R_instr_func == FUNC_DIV)) ) begin 
                 DivStart <=0;
             end
             else begin state <= WRITE_BACK; end
@@ -488,7 +493,7 @@ module mips_cpu_bus(
                 HI <= ALUOut;
             end else if(instr_opcode == OPCODE_R && R_instr_func == FUNC_MTLO)  begin
                 LO <= ALUOut;
-            end else if(instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU)) begin
+            end else if(instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU) && !DivDbz) begin
                 HI <= DivRemainder;
                 LO <= DivQuotient;
             end 
@@ -524,7 +529,10 @@ module mips_cpu_bus(
         .a(ALUInA), .b(ALUInB), .out(MultOut), .sign(MultSign)
     );
     mips_cpu_divider DivInst(
-        .clk(clk), .start(DivStart),.Dividend(ALUInA), .Divisor(ALUInB), .Quotient(DivQuotient), .Remainder(DivRemainder), .done(DivDone), .dbz(DivDbz), .reset(DivReset)
+        .clk(clk), .start(DivStart), .sign(DivSign),
+        .Dividend(ALUInA), .Divisor(ALUInB), 
+        .Quotient(DivQuotient), .Remainder(DivRemainder), 
+        .done(DivDone), .dbz(DivDbz), .reset(DivReset)
     );
 
 endmodule
