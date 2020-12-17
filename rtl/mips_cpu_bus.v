@@ -1,7 +1,7 @@
 module mips_cpu_bus(
 
     input logic clk,
-    input logic rst,
+    input logic reset,
 
     output logic active,
     output logic[31:0] register_v0,
@@ -231,7 +231,7 @@ module mips_cpu_bus(
 
     // This is the simple state machine. The state switching is just drafted, and will depend on the individual instructions
     always @(posedge clk) begin
-        if (rst) begin
+        if (reset) begin
             $display("CPU Resetting");
             state <= INSTR_FETCH;
             regReset <= 1;
