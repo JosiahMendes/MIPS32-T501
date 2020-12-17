@@ -1,0 +1,6 @@
+addiu t1 r0 0xfffd
+addiu v0 v0 0x1
+bne t1 r0 0xFFFe
+addiu t1 t1 0x001
+jr $0
+sll $0 $0 0x0 
