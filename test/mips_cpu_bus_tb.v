@@ -19,7 +19,7 @@ module mips_cpu_bus_tb;
     logic[31:0] CPUaddress;
     logic[15:0] RAMaddress;
 
-    assign RAMaddress = CPUaddress-32'hBFC00000;
+    assign RAMaddress = CPUaddress - 32'hBFC00000;
 
     mips_cpu_bus_tb_memory #(RAM_INIT_FILE) ramInst(.clk(clk), .write(write), .read(read), 
         .writedata(writedata), .addr(RAMaddress), .byteenable(byteenable),
@@ -63,6 +63,9 @@ module mips_cpu_bus_tb;
         else $display("TB : CPU did not set active=1 after reset.");
 
         while (active) begin
+            if((CPUaddress<32'hBFC00000 || CPUaddress > 32'hBFC07FFF ) && (write||read) && CPUaddress != 32'b0) begin
+                $fatal(2, "Test accessed memory address %h outside of range", CPUaddress);
+            end
             @(posedge clk)begin
             end
         end

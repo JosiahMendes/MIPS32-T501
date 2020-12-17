@@ -30,7 +30,7 @@ module mips_cpu_bus_tb_memory
 
     always @(posedge clk) begin
         if(write && !read) begin
-            $display("Writing %h to Memory", writedata);
+            $display("Writing %h to Memory Address %h", writedata, addr);
             case(byteenable)
                 4'b1111: begin
                     memory[addr]<=writedata[7:0];
