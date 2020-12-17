@@ -1,15 +1,15 @@
 module mips_cpu_multiplier(
     input logic [31:0] a, //Using signed logic for now, until a problem with arises
     input logic [31:0] b,//Coudlnt use signed ports, had a port decleration error
-    input logic sign,
+    input logic sign, clk,
     output logic [63:0] out
 );
-  //  always_comb begin
+    always_ff @(posedge clk) begin
 
-//        if(sign)begin out = $signed(a)*$signed(b); end
-//        else begin out =$unsigned(a)*$unsigned(b); end
-//    end
-
+        if(sign)begin out = $signed(a)*$signed(b); end
+        else begin out =$unsigned(a)*$unsigned(b); end
+    end
+/*
        logic [1:0] temp;
        integer i;
        logic E1;
@@ -42,5 +42,5 @@ module mips_cpu_multiplier(
           end
 
         end
-
+*/
 endmodule

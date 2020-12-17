@@ -88,8 +88,8 @@ module mips_cpu_bus(
         FUNC_AND  = 6'b100100,
         FUNC_OR   = 6'b100101,
 
-        FUNC_DIV  = 6'b011010,//TODO
-        FUNC_DIVU = 6'b011011,//TODO
+        FUNC_DIV  = 6'b011010,
+        FUNC_DIVU = 6'b011011,
         FUNC_MULT = 6'b011000,
         FUNC_MULTU= 6'b011001,
 
@@ -526,7 +526,7 @@ module mips_cpu_bus(
         .result(ALUOut), .zero(ALUZero), .sa(R_instr_shamt)
     );
     mips_cpu_multiplier MultInst(
-        .a(ALUInA), .b(ALUInB), .out(MultOut), .sign(MultSign)
+        .a(ALUInA), .b(ALUInB), .out(MultOut), .sign(MultSign), .clk(clk)
     );
     mips_cpu_divider DivInst(
         .clk(clk), .start(DivStart), .sign(DivSign),
