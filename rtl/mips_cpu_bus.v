@@ -482,14 +482,14 @@ module mips_cpu_bus(
                             :(instr_opcode == OPCODE_LH)  ? {{16{readdata[15]}},readdata[15:0]}
                             :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}}
                             :(instr_opcode == OPCODE_LW)  ? readdata
-                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 0) ? {readdata[7:0],regRdDataA[23:0]}
-                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 1) ? {readdata[15:0],regRdDataA[15:0]}
-                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 2) ? {readdata[23:0],regRdDataA[7:0]}
+                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 0) ? {readdata[7:0],regRdDataB[23:0]}
+                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 1) ? {readdata[15:0],regRdDataB[15:0]}
+                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 2) ? {readdata[23:0],regRdDataB[7:0]}
                             :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 3) ? readdata
                             :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 0) ? readdata
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 1) ? {regRdDataA[31:24],readdata[23:0]}
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 2) ? {regRdDataA[31:16],readdata[15:0]}
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 3) ? {regRdDataA[31:8],readdata[7:0]}
+                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 1) ? {regRdDataB[31:24],readdata[23:0]}
+                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 2) ? {regRdDataB[31:16],readdata[15:0]}
+                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 3) ? {regRdDataB[31:8],readdata[7:0]}
                             :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL) && branch == 1))) ? PC+8
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFHI) ? HI
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFLO) ? LO
