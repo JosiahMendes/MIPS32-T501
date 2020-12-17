@@ -1,4 +1,4 @@
-addiu t1 r0 0x0
+addiu t1 r0 0x3
 addiu t2 r0 0x1
 addiu t3 r0 0x1
 addu t2 t2 t3
