@@ -532,7 +532,7 @@ module mips_cpu_bus(
     );
     mips_cpu_ALU ALUInst(
         .op(ALUop), .a(ALUInA), .b(ALUInB),
-        .result(ALUOut), .zero(ALUZero), .sa(R_instr_shamt)
+        .result(ALUOut), .zero(ALUZero), .sa(R_instr_shamt), .clk(clk)
     );
     mips_cpu_multiplier MultInst(
         .a(ALUInA), .b(ALUInB), .out(MultOut), .sign(MultSign), .clk(clk)

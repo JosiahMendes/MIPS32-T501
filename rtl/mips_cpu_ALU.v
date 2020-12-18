@@ -4,7 +4,8 @@ module mips_cpu_ALU (
   input logic [31:0] b,
   input logic [4:0] sa,
   output logic [31:0] result,
-  output logic zero
+  output logic zero,
+  input logic clk
 
 );
   timeunit 1ns / 10ps;
@@ -17,7 +18,7 @@ module mips_cpu_ALU (
   assign lower = b[15:0];
 
 
-  always_comb begin
+  always_ff @(negedge clk) begin
     case (op)
       0: begin result = a & b; end //bitwise AND
       1: begin result = a | b; end //bitwise OR
