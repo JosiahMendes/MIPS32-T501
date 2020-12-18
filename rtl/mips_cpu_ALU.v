@@ -13,7 +13,7 @@ module mips_cpu_ALU (
   logic [15:0] lower;
 
   assign zero = (result == 0);
-  assign sav = (op==9 || op==10 || op==11) ? a[4:0] : 4'b0;
+  assign sav = (op==9 || op==10 || op==11) ? a[4:0] : 5'b0;
   assign lower = b[15:0];
 
 
