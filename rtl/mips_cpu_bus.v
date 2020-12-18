@@ -157,7 +157,10 @@ module mips_cpu_bus(
     //Register Connections
     logic regReset;
     logic regWriteEn;
-    logic [4:0]  regDest,     regRdA,     regRdB;
+    logic [4:0]  regDest;
+    wire  [4:0] regRdA,     regRdB;
+	assign regRdA = readdata[25:21];
+	assign regRdB = readdata[20:16];
     logic [31:0] regDestData, regRdDataA, regRdDataB;
 
     logic regWriteEnable;
@@ -246,8 +249,8 @@ module mips_cpu_bus(
             $display("                                              CPU: Register $v0 contains  %h",register_v0);
             $display("CPU-DECODE      Instruction Fetched is %h,    reading from registers %d and %d ", readdata, readdata[25:21], readdata[20:16] );
             state <= EXEC;
-            regRdA <= readdata[25:21];
-            regRdB <= readdata[20:16];
+            //regRdA <= readdata[25:21];
+            //regRdB <= readdata[20:16];
             instr <= readdata;
             //Done
         end

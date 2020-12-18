@@ -18,9 +18,10 @@ module mips_cpu_registers
     );
 
     reg [31:0] Register[0:31]; //declare 32 registers 32 bits wide
+    /*
 
     assign rdDataA = (reset == 1) ? 0 : Register[rdAddrA]; //combinatorial read
-    assign rdDataB = (reset == 1) ? 0 : Register[rdAddrB];
+    assign rdDataB = (reset == 1) ? 0 : Register[rdAddrB];*/
     assign register_v0 = Register[2];  // combinatorially puts register_v0 into an outputable entity
 
     integer i;
@@ -35,5 +36,7 @@ module mips_cpu_registers
             $display("Register %d being written to with data %h",wrAddr,wrData);
             Register[wrAddr] <= wrData; //write data to specified register.
         end
+        rdDataA <= (reset == 1) ? 0 : Register[rdAddrA];
+		rdDataB <= (reset == 1) ? 0 : Register[rdAddrB];
     end
 endmodule
