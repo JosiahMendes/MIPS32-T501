@@ -180,23 +180,8 @@ module mips_cpu_bus(
     assign ALUSrc = (instr_opcode == OPCODE_ORI ||  instr_opcode == OPCODE_XORI || instr_opcode == OPCODE_ANDI) ? 2'b00
                     :(instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE || instr_opcode == OPCODE_REGIMM)? 2'b01 
                     : 2'b11;
-    assign ALUop =  (instr_opcode == OPCODE_ANDI    || (instr_opcode == OPCODE_R && R_instr_func == FUNC_AND)) ? ALU_AND
-                    : (instr_opcode == OPCODE_ORI   || (instr_opcode == OPCODE_R && R_instr_func == FUNC_OR)) ? ALU_OR
-                    : (instr_opcode == OPCODE_XORI  || (instr_opcode == OPCODE_R && R_instr_func == FUNC_XOR)) ? ALU_XOR
-                    : (instr_opcode == OPCODE_SLTI  || (instr_opcode == OPCODE_R && R_instr_func == FUNC_SLT)) ? ALU_SLT
-                    : (instr_opcode == OPCODE_SLTIU || (instr_opcode == OPCODE_R && R_instr_func == FUNC_SLTU)) ? ALU_SLTU
-                    : (instr_opcode == OPCODE_BLEZ  || instr_opcode == OPCODE_BGTZ || (instr_opcode == OPCODE_REGIMM && (I_instr_rt == BGEZ || I_instr_rt == BGEZAL || I_instr_rt == BLTZ || I_instr_rt == BLTZAL))) ? ALU_A
-                    : (instr_opcode == OPCODE_BEQ   || (instr_opcode == OPCODE_R && R_instr_func == FUNC_SUBU) || instr_opcode == OPCODE_BNE ) ? ALU_SUB
-                    : (instr_opcode == OPCODE_LUI) ? ALU_LUI
-                    : (instr_opcode == OPCODE_R && R_instr_func == FUNC_SRAV) ? ALU_SRAV
-                    : (instr_opcode == OPCODE_R && R_instr_func == FUNC_SRLV) ? ALU_SRLV
-                    : (instr_opcode == OPCODE_R && R_instr_func == FUNC_SLLV) ? ALU_SLLV
-                    : (instr_opcode == OPCODE_R && R_instr_func == FUNC_SRA) ? ALU_SRA
-                    : (instr_opcode == OPCODE_R && R_instr_func == FUNC_SLL) ? ALU_SLL
-                    : (instr_opcode == OPCODE_R && R_instr_func == FUNC_SRL) ? ALU_SRL
-                    : ALU_ADD;
 
-    //Multiplier Connection
+    //Multiplier Connections
     logic [63:0] MultOut;
     logic MultSign;
 
@@ -273,16 +258,16 @@ module mips_cpu_bus(
             
             ALUInB <= (ALUSrc == 2'b00) ? {16'b0, I_instr_immediate} : (ALUSrc == 2'b11) ? exImmediate :regRdDataB;
             case (instr_opcode)//Add case statements
-                /*OPCODE_ADDIU: begin
+                OPCODE_ADDIU: begin
                     ALUop <= ALU_ADD;
                 end
-                OPCODE_ANDI:begin //DONE
+                OPCODE_ANDI:begin
                     ALUop<=ALU_AND;
                 end
-                OPCODE_ORI:begin //DONE
+                OPCODE_ORI:begin
                     ALUop<=ALU_OR;
                 end
-                OPCODE_XORI: begin//DONE
+                OPCODE_XORI: begin
                     ALUop<=ALU_XOR;
                 end
 
@@ -301,7 +286,7 @@ module mips_cpu_bus(
                 OPCODE_LHU: begin
                     ALUop <= ALU_ADD;
                 end
-                OPCODE_LUI: begin //DONE
+                OPCODE_LUI: begin
                     ALUop <=ALU_LUI;
                 end
                 OPCODE_LWL: begin
@@ -320,12 +305,12 @@ module mips_cpu_bus(
                 OPCODE_SB: begin
                     ALUop <= ALU_ADD;
                 end
-                OPCODE_SLTI: begin //DONE
+                OPCODE_SLTI: begin
                     ALUop <= ALU_SLT;
                 end
-                OPCODE_SLTIU: begin //DONE
+                OPCODE_SLTIU: begin
                     ALUop <= ALU_SLTU;
-                end*/
+                end
 
                 OPCODE_J :begin
                     branch <= 1;
@@ -336,37 +321,37 @@ module mips_cpu_bus(
                     PC_temp <= {PC_increment[31:28],J_instr_addr, 2'd0};
                 end
 
-                /*OPCODE_BEQ: begin //done
+                OPCODE_BEQ: begin
                     ALUop <= ALU_SUB;
                 end
-                OPCODE_BNE: begin //done
+                OPCODE_BNE: begin
                     ALUop <= ALU_SUB;
                 end
 
-                OPCODE_BLEZ:begin //DONE
+                OPCODE_BLEZ:begin 
                     ALUop <= ALU_A;
                 end
-                OPCODE_BGTZ:begin //DONE
+                OPCODE_BGTZ:begin
                     ALUop <= ALU_A;
                 end
                 
                 
                 OPCODE_REGIMM: begin
                     case(I_instr_rt)
-                        BGEZ:begin //DONE
+                        BGEZ:begin
                             ALUop <=ALU_A;
                         end
-                        BGEZAL:begin //DONE
+                        BGEZAL:begin
                             ALUop <=ALU_A;
                         end
-                        BLTZ:begin //DONE
+                        BLTZ:begin
                             ALUop<=ALU_A;
                         end
-                        BLTZAL:begin //DONE
+                        BLTZAL:begin
                             ALUop<=ALU_A;
                         end
                     endcase
-                end*/
+                end
 
 
                 OPCODE_R: begin
@@ -379,42 +364,42 @@ module mips_cpu_bus(
                             branch <=1;
                             PC_temp<=regRdDataA;
                         end
-/*
-                        FUNC_SLL:begin //DONE
+
+                        FUNC_SLL:begin
                             ALUop<=ALU_SLL;
                         end
-                        FUNC_SRL: begin //DONE
+                        FUNC_SRL: begin
                             ALUop<=ALU_SRL;
                         end
-                        FUNC_SRA: begin //DONE
+                        FUNC_SRA: begin
                             ALUop<=ALU_SRA;
                         end
-                        FUNC_SLLV: begin //DONE
+                        FUNC_SLLV: begin
                             ALUop <= ALU_SLLV;
                         end
-                        FUNC_SRLV: begin //DONE
+                        FUNC_SRLV: begin
                             ALUop <= ALU_SRLV;
                         end
-                        FUNC_SRAV: begin //DONE
+                        FUNC_SRAV: begin
                             ALUop <= ALU_SRAV;
                         end
 
                         FUNC_ADDU:begin
                             ALUop<=ALU_ADD;
                         end
-                        FUNC_SUBU:begin //done
+                        FUNC_SUBU:begin
                             ALUop<=ALU_SUB;
                         end
-                        FUNC_XOR:begin //DONE
+                        FUNC_XOR:begin
                             ALUop<=ALU_XOR;
                         end
-                        FUNC_AND: begin //DONE
+                        FUNC_AND: begin
                             ALUop <=ALU_AND;
                         end
-                        FUNC_OR: begin //DONE
+                        FUNC_OR: begin
                             ALUop <= ALU_OR;
                         end
-*/
+
                         FUNC_MULT: begin
                             MultSign <=1;
                         end
@@ -428,23 +413,21 @@ module mips_cpu_bus(
                         FUNC_DIV: begin
                             DivStart <= 1;
                         end
-/*
+
                         FUNC_MTHI: begin
                             ALUop <= ALU_ADD;
                         end
                         FUNC_MTLO: begin
                             ALUop <= ALU_ADD;
                         end
-                        FUNC_SLT: begin //DONE
+                        FUNC_SLT: begin
                             ALUop <= ALU_SLT;
                         end
-                        FUNC_SLTU: begin //DONE
+                        FUNC_SLTU: begin
                             ALUop <= ALU_SLTU;
-                        end */
-                        default : begin end
+                        end
                     endcase
                 end
-                default: begin end
             endcase
         end
         if (state==MEM) begin
@@ -477,7 +460,7 @@ module mips_cpu_bus(
             end
         end
         if (state==WRITE_BACK) begin
-            $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d..., HI = %h, LO = %h, ALUOut = %h" ,readdata, ALUOut, I_instr_rt, HI, LO, ALUOut);
+            $display("CPU-WRITEBACK   Retrieved Memory     = %h,    Current ALUOut     =    %h,     Writing to Register %d..., HI = %h, LO = %h" ,readdata, ALUOut, I_instr_rt, HI, LO);
             state <= INSTR_FETCH;
             regDest <= (instr_opcode == OPCODE_JAL || (instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR && R_instr_rd == 0)||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL) && branch == 1)) ? 5'd31
                         :(instr_opcode == OPCODE_R) ? R_instr_rd
