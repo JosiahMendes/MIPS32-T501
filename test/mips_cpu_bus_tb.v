@@ -69,6 +69,8 @@ module mips_cpu_bus_tb;
             @(posedge clk)begin
             end
         end
+
+        #10
         $display("TB : Register V0 has %h",register_v0);
         $display("TB : finished; active=0");
         

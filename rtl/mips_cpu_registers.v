@@ -22,7 +22,7 @@ module mips_cpu_registers
 
     assign rdDataA = (reset == 1) ? 0 : Register[rdAddrA]; //combinatorial read
     assign rdDataB = (reset == 1) ? 0 : Register[rdAddrB];*/
-    assign register_v0 = Register[2];  // combinatorially puts register_v0 into an outputable entity
+    //assign register_v0 = Register[2];  // combinatorially puts register_v0 into an outputable entity
 
     integer i;
     always@(posedge clk) begin
@@ -38,5 +38,6 @@ module mips_cpu_registers
         end
         rdDataA <= (reset == 1) ? 0 : Register[rdAddrA];
 		rdDataB <= (reset == 1) ? 0 : Register[rdAddrB];
+        register_v0 <= Register[2];
     end
 endmodule
