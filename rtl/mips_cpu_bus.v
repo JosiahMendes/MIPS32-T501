@@ -15,7 +15,6 @@ module mips_cpu_bus(
     output logic[3:0] byteenable,
     input logic[31:0] readdata
 );
-        timeunit 1ns / 10ps;
 
     // This wire holds the whole instruction
     logic[32-1:0] instr;
@@ -25,14 +24,14 @@ module mips_cpu_bus(
     // The remaining parts of the instruction depend on the type (R,I,J)
 
     // R-format instruction sub-sections
-    wire [4:0]  R_instr_rs          = instr[25:21];
-    wire [4:0]  R_instr_rt          = instr[20:16];
+    //wire [4:0]  R_instr_rs          = instr[25:21];
+    //wire [4:0]  R_instr_rt          = instr[20:16];
     wire [4:0]  R_instr_rd          = instr[15:11];
     wire [4:0]  R_instr_shamt       = instr[10:6];
     wire [5:0]  R_instr_func        = instr[5:0];
 
     // I-format instruction sub-sections
-    wire [4:0]  I_instr_rs          = instr[25:21];
+    //wire [4:0]  I_instr_rs          = instr[25:21];
     wire [4:0]  I_instr_rt          = instr[20:16];
     wire [15:0] I_instr_immediate   = instr[15:0];
 
@@ -119,23 +118,23 @@ module mips_cpu_bus(
         HALTED       = 3'b111
     } state_t;
 
-    typedef enum logic[4:0]{
-        ALU_AND = 5'd0,
-        ALU_OR = 5'd1,
-        ALU_ADD = 5'd2,
-        ALU_SUB = 5'd3,
-        ALU_SLT = 5'd4,
-        ALU_XOR = 5'd5,
-        ALU_SLL = 5'd6,
-        ALU_SRL = 5'd7,
-        ALU_SRA = 5'd8,
-        ALU_SLLV = 5'd9,
-        ALU_SRLV = 5'd10,
-        ALU_SRAV = 5'd11,
-        ALU_LUI  = 5'd12,
-        ALU_SLTU = 5'd13,
-        ALU_A    = 5'd14,
-        ALU_B    = 5'd15
+    typedef enum logic[3:0]{
+        ALU_AND = 4'd0,
+        ALU_OR =  4'd1,
+        ALU_ADD = 4'd2,
+        ALU_SUB = 4'd3,
+        ALU_SLT = 4'd4,
+        ALU_XOR = 4'd5,
+        ALU_SLL = 4'd6,
+        ALU_SRL = 4'd7,
+        ALU_SRA = 4'd8,
+        ALU_SLLV = 4'd9,
+        ALU_SRLV = 4'd10,
+        ALU_SRAV = 4'd11,
+        ALU_LUI  = 4'd12,
+        ALU_SLTU = 4'd13,
+        ALU_A    = 4'd14,
+        ALU_B    = 4'd15
     }aluop_t;
 
     typedef enum logic[4:0]{
@@ -149,9 +148,8 @@ module mips_cpu_bus(
     logic [2:0] state;
 
     //PC
-    logic [31:0] PC, PC_increment, PC_temp, PC_link;
+    logic [31:0] PC, PC_increment, PC_temp;
     assign PC_increment = PC+4;
-    assign PC_link = PC+8;
 
     //HI LO
     logic[31:0] HI, LO;
@@ -163,12 +161,6 @@ module mips_cpu_bus(
     logic [31:0] regDestData, regRdDataA, regRdDataB;
 
     logic regWriteEnable;
-    logic [2:0] regDestDataSel;
-
-    assign regDestDataSel = (instr_opcode == OPCODE_LWR||instr_opcode == OPCODE_LHU
-                            ||instr_opcode == OPCODE_LBU||instr_opcode == OPCODE_LW
-                            ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LH
-                            ||instr_opcode == OPCODE_LB) ? 1 :0;
 
     assign regWriteEnable = !(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MTLO ||R_instr_func == FUNC_MTHI
                                                         ||R_instr_func == FUNC_JR ||R_instr_func == FUNC_MULT
@@ -181,7 +173,7 @@ module mips_cpu_bus(
                             || (instr_opcode == OPCODE_LW && !(ALUOut[0] == 0 && ALUOut[1] == 0)));
 
     //ALU Connections
-    logic [4:0] ALUop;
+    logic [3:0] ALUop;
     logic [31:0] ALUInA, ALUInB, ALUOut;
     logic ALUZero;
     logic [2:0] ALUSrc;
@@ -197,13 +189,9 @@ module mips_cpu_bus(
     logic [31:0] DivQuotient, DivRemainder;
     logic DivStart, DivDone, DivDbz, DivReset, DivSign;
 
-    assign DivSign = (instr_opcode == OPCODE_R && R_instr_func == FUNC_DIV) ? 1 :0;
+    assign DivSign = (instr_opcode == OPCODE_R && R_instr_func == FUNC_DIV) ? 1'b1 :1'b0;
 
     //assign DivStart = (state == EXEC && instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU )) ? 1 :0;
-
-    //Sign Extender
-    logic [15:0] unextended;
-    logic [31:0] extended;
 
 
     //Memory Control
@@ -215,14 +203,14 @@ module mips_cpu_bus(
                                         ||(instr_opcode == OPCODE_LW && ALUOut[0] == 0 && ALUOut[1] == 0)
                                         ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LWR
                                         ||instr_opcode == OPCODE_LB||instr_opcode == OPCODE_LBU))
-                    ) ? 1 : 0;
+                    ) ? 1'b1 : 1'b0;
     assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW ||  instr_opcode == OPCODE_LWL || instr_opcode == OPCODE_LWR ||instr_opcode == OPCODE_SW))) ? 4'b1111
                         : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? 4'b0001
                         : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH)) ? 4'b0011
-                        : 4'b0000;//TODO Temp
+                        : 4'b0000;
     assign write =  (state == MEM &&    (instr_opcode == OPCODE_SW || instr_opcode == OPCODE_SB
                                         ||instr_opcode == OPCODE_SH)
-                    ) ? 1 :0; //TODO Temp
+                    ) ? 1'b1 :1'b0;
     assign writedata = regRdDataB;
 
     //Branch Delay Slot Handling
@@ -268,7 +256,7 @@ module mips_cpu_bus(
             state <= MEM;
             ALUInA <= regRdDataA;
             
-            ALUInB <= (ALUSrc == 2'b00) ? {16'b0, I_instr_immediate} : (ALUSrc == 2'b11) ? {{16{I_instr_immediate[15]}}, I_instr_immediate} :regRdDataB;
+            ALUInB <= (ALUSrc == 2'b00) ? {16'b0, I_instr_immediate} : (ALUSrc == 2'b11) ? exImmediate :regRdDataB;
             case (instr_opcode)//Add case statements
                 OPCODE_ADDIU: begin
                     ALUop <= ALU_ADD;
@@ -494,7 +482,7 @@ module mips_cpu_bus(
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFHI) ? HI
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFLO) ? LO
                             :ALUOut;
-            regWriteEn<= (regWriteEnable) ? 1 : 0;
+            regWriteEn<= (regWriteEnable) ? 1'b1 : 1'b0;
             if(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MULT || R_instr_func == FUNC_MULTU)) begin
                 HI <= MultOut[63:32];
                 LO <= MultOut[31:0];
