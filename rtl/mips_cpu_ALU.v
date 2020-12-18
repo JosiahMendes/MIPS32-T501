@@ -1,5 +1,5 @@
 module mips_cpu_ALU (
-  input logic [4:0] op,
+  input logic [3:0] op,
   input logic [31:0] a,
   input logic [31:0] b,
   input logic [4:0] sa,
@@ -8,13 +8,12 @@ module mips_cpu_ALU (
   input logic clk
 
 );
-  timeunit 1ns / 10ps;
 
   logic [4:0] sav;
   logic [15:0] lower;
 
   assign zero = (result == 0);
-  assign sav = (op==9 || op==10 || op==11) ? a[4:0] : 0;
+  assign sav = (op==9 || op==10 || op==11) ? a[4:0] : 4'b0;
   assign lower = b[15:0];
 
 
@@ -33,7 +32,7 @@ module mips_cpu_ALU (
       10: begin result = b >> sav; end //shift right variable
       11: begin result = $signed(b) >>> sav; end //arithmetic shift right variable
       12: begin result = {lower,16'd0}; end
-      13: begin result = $unsigned(a) < $unsigned(b) ? 1 : 0; end//sltu
+      13: begin result = $unsigned(a) < $unsigned(b) ? 1'b1 : 1'b0; end//sltu
       14: begin result = a; end//a
       15: begin result = b; end //b
 
