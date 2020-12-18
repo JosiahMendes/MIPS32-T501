@@ -1,10 +1,8 @@
 lui $8 0xbfc0
 addiu $8 $8 0x30
 addiu v0 r0 0xffff
-lwr v0 3 $8
-lwr v0 2 $8
 jr r0
-lwr v0 1 $8
+lwr v0 3 $8
 data:
 0xbfc00030: 0xac
 0xbfc00031: 0xab
