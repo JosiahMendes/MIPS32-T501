@@ -23,15 +23,11 @@ module mips_cpu_registers
     assign rdDataB = (reset == 1) ? 0 : Register[rdAddrB];
     assign register_v0 = Register[2];  // combinatorially puts register_v0 into an outputable entity
 
-    initial begin
-        Register[0] <= 0; //ensure that zero register is hardcoded to 0
-    end
-
     integer i;
     always@(posedge clk) begin
         if(reset) begin
             for( i = 0; i<32; i= i+1)begin
-                Register[i] = 0; //set all registers to 0 when reset.
+                Register[i] <= 0; //set all registers to 0 when reset.
             end
             $display("Registers reset");
         end else if (write && wrAddr == 0) begin // do nothing if attempt to write to 0 register
