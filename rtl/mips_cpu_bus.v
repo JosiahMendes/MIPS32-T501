@@ -16,6 +16,7 @@ module mips_cpu_bus(
     input logic[31:0] readdata
 );
 
+
     // This wire holds the whole instruction
     logic[32-1:0] instr;
 
