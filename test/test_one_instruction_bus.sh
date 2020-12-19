@@ -87,7 +87,7 @@ if test -d "test/testcases/${INSTR}" ; then
             echo "  ${TESTNAME} ${INSTR} Fail - Doesn't Match Given Reference"
         else
             echo "  ${TESTNAME} ${INSTR} Pass"
-            test/testcases/${INSTR}/${TESTNAME}.stdout
+            #rm test/testcases/${INSTR}/${TESTNAME}.stdout
             rm test/testcases/${INSTR}/${TESTNAME}_MEM.txt
         fi
         rm test/testcases/${INSTR}/${TESTNAME}

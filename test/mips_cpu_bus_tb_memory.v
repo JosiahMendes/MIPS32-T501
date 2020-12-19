@@ -16,12 +16,14 @@ module mips_cpu_bus_tb_memory
     parameter RAM_INIT_FILE ="";
 
     reg[7:0] memory [0:32767];
+    logic Team5;
 
     initial begin
         integer i;
         for (i = 0; i<32768; i++)begin
             memory[i] = 0;
         end
+        Team5 = 0;
         if (RAM_INIT_FILE != "") begin
             $display("RAM : INIT : Loading RAM contents from %s", RAM_INIT_FILE);
             $readmemh(RAM_INIT_FILE, memory);
