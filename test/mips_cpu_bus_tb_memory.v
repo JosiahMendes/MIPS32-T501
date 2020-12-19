@@ -23,6 +23,7 @@ module mips_cpu_bus_tb_memory
         for (i = 0; i<32768; i++)begin
             memory[i] = 0;
         end
+        waitrequest = 0;
         Team5 = 0;
         if (RAM_INIT_FILE != "") begin
             $display("RAM : INIT : Loading RAM contents from %s", RAM_INIT_FILE);

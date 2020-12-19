@@ -53,13 +53,13 @@ module mips_cpu_bus_tb;
     initial begin
         reset <= 0;
 
-        @(posedge clk);
+        @(negedge clk);
         reset <= 1;
 
-        @(posedge clk);
+        @(negedge clk);
         reset <= 0;
 
-        @(posedge clk);
+        @(negedge clk);
         assert(active==1)
         else $display("TB : CPU did not set active=1 after reset.");
 
