@@ -3,7 +3,7 @@ lw t2 0x20(t1)
 lw t3 0x24(t1)
 divu t2 t3
 jr r0
-mflo v0
+mfhi v0
 data:
 0xbfc00020: 0x07
 0xbfc00021: 0x59
