@@ -490,7 +490,7 @@ module mips_cpu_bus(
                 HI <= ALUOut;
             end else if(instr_opcode == OPCODE_R && R_instr_func == FUNC_MTLO)  begin
                 LO <= ALUOut;
-            end else if(instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU) && !DivDbz) begin
+            end else if(instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU)) begin
                 HI <= DivRemainder;
                 LO <= DivQuotient;
             end 
