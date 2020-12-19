@@ -17,24 +17,24 @@ module mips_cpu_ALU (
   assign lower = b[15:0];
 
 
-  always_ff @(negedge clk) begin
+  always_ff @(posedge clk) begin
     case (op)
-      0: begin result = a & b; end //bitwise AND
-      1: begin result = a | b; end //bitwise OR
-      2: begin result = a + b; end //add
-      3: begin result = a - b; end //sub
-      4: begin result = $signed(a) < $signed(b) ? 1 : 0; end //slt
-      5: begin result = a ^ b; end //bitwise XOR
-      6: begin result = b << sa; end//shift left
-      7: begin result = b >> sa; end //shift right
-      8: begin result = $signed(b) >>> sa; end //arithmetic shift right
-      9: begin result = b << sav; end //shift left variable
-      10: begin result = b >> sav; end //shift right variable
-      11: begin result = $signed(b) >>> sav; end //arithmetic shift right variable
-      12: begin result = {lower,16'd0}; end
-      13: begin result = $unsigned(a) < $unsigned(b) ? 1'b1 : 1'b0; end//sltu
-      14: begin result = a; end//a
-      15: begin result = b; end //b
+      0: begin result <= a & b; end //bitwise AND
+      1: begin result <= a | b; end //bitwise OR
+      2: begin result <= a + b; end //add
+      3: begin result <= a - b; end //sub
+      4: begin result <= $signed(a) < $signed(b) ? 1 : 0; end //slt
+      5: begin result <= a ^ b; end //bitwise XOR
+      6: begin result <= b << sa; end//shift left
+      7: begin result <= b >> sa; end //shift right
+      8: begin result <= $signed(b) >>> sa; end //arithmetic shift right
+      9: begin result <= b << sav; end //shift left variable
+      10: begin result <= b >> sav; end //shift right variable
+      11: begin result <= $signed(b) >>> sav; end //arithmetic shift right variable
+      12: begin result <= {lower,16'd0}; end
+      13: begin result <= $unsigned(a) < $unsigned(b) ? 1'b1 : 1'b0; end//sltu
+      14: begin result <= a; end//a
+      default: begin end
 
     endcase
   end
