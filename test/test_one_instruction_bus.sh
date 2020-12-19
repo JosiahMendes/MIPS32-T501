@@ -47,6 +47,8 @@ if test -d "test/testcases/${INSTR}" ; then
         set +e
         #run this testname
         test/testcases/${INSTR}/${TESTNAME} > test/testcases/${INSTR}/${TESTNAME}.stdout
+        mv Simulation.vcd test/testcases/${INSTR}/${TESTNAME}.vcd
+
 
         #capture the exit code of the testbench in a variable
         RESULT=$?
@@ -85,7 +87,7 @@ if test -d "test/testcases/${INSTR}" ; then
             echo "  ${TESTNAME} ${INSTR} Fail - Doesn't Match Given Reference"
         else
             echo "  ${TESTNAME} ${INSTR} Pass"
-            rm test/testcases/${INSTR}/${TESTNAME}.stdout
+            test/testcases/${INSTR}/${TESTNAME}.stdout
             rm test/testcases/${INSTR}/${TESTNAME}_MEM.txt
         fi
         rm test/testcases/${INSTR}/${TESTNAME}

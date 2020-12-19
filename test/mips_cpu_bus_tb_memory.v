@@ -31,6 +31,7 @@ module mips_cpu_bus_tb_memory
     always @(posedge clk) begin
         if(write && !read) begin
             $display("Writing %h to Memory Address %h", writedata, addr);
+            readdata <= 32'bx;
             case(byteenable)
                 4'b1111: begin
                     memory[addr]<=writedata[7:0];
@@ -61,8 +62,7 @@ module mips_cpu_bus_tb_memory
                 default: begin 
                 end
             endcase
-        end
-        if(read && !write)begin
+        end else if(read && !write)begin
             case(byteenable)
                 4'b1111: begin
                     readdata[7:0]<=memory[addr];
@@ -101,6 +101,9 @@ module mips_cpu_bus_tb_memory
                 default: begin
                 end
                 endcase 
+        end else begin
+            readdata <= 32'bx;
         end
+
     end
 endmodule
