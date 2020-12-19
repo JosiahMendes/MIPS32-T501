@@ -1,4 +1,4 @@
-lui v1 0xbfc0
+lui v0 0xbfc0
 jr r0
 lh v0 0x21(v1)
 data:
