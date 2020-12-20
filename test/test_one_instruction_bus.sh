@@ -20,11 +20,12 @@ if test -d "test/testcases/${INSTR}" ; then
         rm -f test/testcases/${INSTR}/${TESTNAME}_MEM.txt
         rm -f test/testcases/*_MEM*
         rm -f test/testcases/${INSTR}/${TESTNAME}.stdout
+        rm -f test/testcases/${INSTR}/${TESTNAME}.vcd
 
         var=$(< test/testcases/${INSTR}/${TESTNAME}.ref)
         fail="FAIL"
 
-        utils/assembler test/testcases/${INSTR}/${TESTNAME}.asm hex littleEndian 1 > test/testcases/${INSTR}/${TESTNAME}_MEM.txt
+        utils/assembler test/testcases/${INSTR}/${TESTNAME}.asm hex littleEndian 1 >| test/testcases/${INSTR}/${TESTNAME}_MEM.txt
 
         >&2 echo "    2 - Compiling test-bench"
         #compile the testbench for this testname
@@ -48,8 +49,8 @@ if test -d "test/testcases/${INSTR}" ; then
         >&2 echo "    3 - Running test-bench"
         set +e
         #run this testname
-        test/testcases/${INSTR}/${TESTNAME} > test/testcases/${INSTR}/${TESTNAME}.stdout
-        mv Simulation.vcd test/testcases/${INSTR}/${TESTNAME}.vcd
+        test/testcases/${INSTR}/${TESTNAME} >| test/testcases/${INSTR}/${TESTNAME}.stdout
+        mv -f Simulation.vcd test/testcases/${INSTR}/${TESTNAME}.vcd
 
 
         #capture the exit code of the testbench in a variable
@@ -70,10 +71,10 @@ if test -d "test/testcases/${INSTR}" ; then
         NOTHING=""
 
         set +e
-        grep "${PATTERN}" test/testcases/${INSTR}/${TESTNAME}.stdout > test/testcases/${INSTR}/${TESTNAME}.out-lines
+        grep "${PATTERN}" test/testcases/${INSTR}/${TESTNAME}.stdout >| test/testcases/${INSTR}/${TESTNAME}.out-lines
         set -e
 
-        sed -e "s/${PATTERN}/${NOTHING}/g" test/testcases/${INSTR}/${TESTNAME}.out-lines > test/testcases/${INSTR}/${TESTNAME}.out
+        sed -e "s/${PATTERN}/${NOTHING}/g" test/testcases/${INSTR}/${TESTNAME}.out-lines >| test/testcases/${INSTR}/${TESTNAME}.out
 
         rm test/testcases/${INSTR}/${TESTNAME}.out-lines
 
