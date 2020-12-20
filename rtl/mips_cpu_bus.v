@@ -19,6 +19,13 @@ module mips_cpu_bus(
     // This wire holds the whole instruction
     logic[32-1:0] instr;
 
+    logic [31:0] addresstemp;
+    logic [1:0] addressend;
+    logic [3:0] bytetranslate;
+
+
+    assign bytetranslate = (addressend == 2'b00) ? 4'b0001 : (addressend == 2'b01) ? 4'b0010 : (addressend == 2'b10) ? 4'b0100 : (addressend == 2'b11) ? 4'b1000 : 4'b1111 ;
+
     wire [5:0]  instr_opcode    = instr[31:26]; // This is common to all instruction formats
 
     // The remaining parts of the instruction depend on the type (R,I,J)
@@ -55,7 +62,7 @@ module mips_cpu_bus(
         OPCODE_BGTZ   = 6'b000111,
         OPCODE_BNE    = 6'b000101,
         OPCODE_SLTI   = 6'b001010,
-        OPCODE_SLTIU = 6'b001011, 
+        OPCODE_SLTIU = 6'b001011,
 
         OPCODE_LB     = 6'b100000,
         OPCODE_LBU    = 6'b100100,
@@ -169,7 +176,7 @@ module mips_cpu_bus(
                             ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BGEZ || I_instr_rt == BLTZ)) || instr_opcode == OPCODE_J
                             || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE|| instr_opcode == OPCODE_BLEZ ||  instr_opcode == OPCODE_BGTZ
                             || instr_opcode == OPCODE_SB || instr_opcode == OPCODE_SH|| instr_opcode == OPCODE_SW
-                            || ((instr_opcode == OPCODE_LH||instr_opcode == OPCODE_LHU) &&  ALUOut[0] != 0) 
+                            || ((instr_opcode == OPCODE_LH||instr_opcode == OPCODE_LHU) &&  ALUOut[0] != 0)
                             || (instr_opcode == OPCODE_LW && !(ALUOut[0] == 0 && ALUOut[1] == 0)));
 
     //ALU Connections
@@ -178,7 +185,7 @@ module mips_cpu_bus(
     logic ALUZero;
     logic [2:0] ALUSrc;
     assign ALUSrc = (instr_opcode == OPCODE_ORI ||  instr_opcode == OPCODE_XORI || instr_opcode == OPCODE_ANDI) ? 2'b00
-                    :(instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE || instr_opcode == OPCODE_REGIMM)? 2'b01 
+                    :(instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE || instr_opcode == OPCODE_REGIMM)? 2'b01
                     : 2'b11;
 
     //Multiplier Connections
@@ -195,9 +202,14 @@ module mips_cpu_bus(
 
 
     //Memory Control
-    assign address =    (state == INSTR_FETCH) ? PC
+    assign addresstemp = (state == INSTR_FETCH) ? PC
                         :(state == MEM && instr_opcode == OPCODE_LWL) ? {ALUOut[31:2],2'd0}
                         : ALUOut;
+
+    assign address = {addresstemp[31:2],2'd0};
+
+    assign addressend = addresstemp[1:0];
+
     assign read =   (state==INSTR_FETCH || (state == MEM &&
                                         (((instr_opcode == OPCODE_LH||instr_opcode == OPCODE_LHU) &&  ALUOut[0] == 0)
                                         ||(instr_opcode == OPCODE_LW && ALUOut[0] == 0 && ALUOut[1] == 0)
@@ -205,8 +217,8 @@ module mips_cpu_bus(
                                         ||instr_opcode == OPCODE_LB||instr_opcode == OPCODE_LBU))
                     ) ? 1'b1 : 1'b0;
     assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW ||  instr_opcode == OPCODE_LWL || instr_opcode == OPCODE_LWR ||instr_opcode == OPCODE_SW))) ? 4'b1111
-                        : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? 4'b0001
-                        : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH)) ? 4'b0011
+                        : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? bytetranslate
+                        : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH) & addressend == 2'b00) ? 4'b0011 : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH) & addressend == 2'b10) ? 4'b1100
                         : 4'b0000;
     assign write =  (state == MEM &&    (instr_opcode == OPCODE_SW || instr_opcode == OPCODE_SB
                                         ||instr_opcode == OPCODE_SH)
@@ -255,7 +267,7 @@ module mips_cpu_bus(
             $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h      shiftamount", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate,R_instr_shamt);
             state <= MEM;
             ALUInA <= regRdDataA;
-            
+
             ALUInB <= (ALUSrc == 2'b00) ? {16'b0, I_instr_immediate} : (ALUSrc == 2'b11) ? exImmediate :regRdDataB;
             case (instr_opcode)//Add case statements
                 OPCODE_ADDIU: begin
@@ -328,14 +340,14 @@ module mips_cpu_bus(
                     ALUop <= ALU_SUB;
                 end
 
-                OPCODE_BLEZ:begin 
+                OPCODE_BLEZ:begin
                     ALUop <= ALU_A;
                 end
                 OPCODE_BGTZ:begin
                     ALUop <= ALU_A;
                 end
-                
-                
+
+
                 OPCODE_REGIMM: begin
                     case(I_instr_rt)
                         BGEZ:begin
@@ -432,18 +444,18 @@ module mips_cpu_bus(
         end
         if (state==MEM) begin
             $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b, DivDone = %b",ALUOut, regRdDataB,write, read, byteenable, DivDbz,DivDone);
-            if (waitrequest || (!DivDone && instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIVU||R_instr_func == FUNC_DIV)) ) begin 
+            if (waitrequest || (!DivDone && instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIVU||R_instr_func == FUNC_DIV)) ) begin
                 DivStart <=0;
             end
             else begin state <= WRITE_BACK; end
 
-            if(instr_opcode == OPCODE_BEQ && ALUZero) begin 
+            if(instr_opcode == OPCODE_BEQ && ALUZero) begin
                 branch <= 1;
                 PC_temp <= PC_increment + {{14{I_instr_immediate[15]}},I_instr_immediate, 2'd0};
-            end else if(instr_opcode == OPCODE_BNE && !ALUZero) begin 
+            end else if(instr_opcode == OPCODE_BNE && !ALUZero) begin
                 branch <= 1;
                 PC_temp <= PC_increment + {{14{I_instr_immediate[15]}},I_instr_immediate, 2'd0};
-            end else if(instr_opcode == OPCODE_BGTZ && ALUOut[31] == 0 && !ALUZero) begin 
+            end else if(instr_opcode == OPCODE_BGTZ && ALUOut[31] == 0 && !ALUZero) begin
                 branch <= 1;
                 PC_temp <= PC_increment + {{14{I_instr_immediate[15]}},I_instr_immediate, 2'd0};
             end else if(instr_opcode == OPCODE_BLEZ && (ALUOut[31] == 1 || ALUZero)) begin
@@ -465,20 +477,20 @@ module mips_cpu_bus(
             regDest <= (instr_opcode == OPCODE_JAL || (instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR && R_instr_rd == 0)||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL))) ? 5'd31
                         :(instr_opcode == OPCODE_R) ? R_instr_rd
                         :I_instr_rt;
-            regDestData <=  (instr_opcode == OPCODE_LB)   ? {{24{readdata[7]}},readdata[7:0]}
-                            :(instr_opcode == OPCODE_LBU) ? {{24'd0,readdata[7:0]}}
-                            :(instr_opcode == OPCODE_LH)  ? {{16{readdata[15]}},readdata[15:0]}
-                            :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}}
+            regDestData <=  (instr_opcode == OPCODE_LB & addresstemp[1:0] == 2'b00) ? {{24{readdata[7]}},readdata[7:0]} : (instr_opcode == OPCODE_LB & addresstemp[1:0] == 2'b01) ? {{24{readdata[15]}},readdata[15:8]} : (instr_opcode == OPCODE_LB & addresstemp[1:0] == 2'b10) ? {{24{readdata[23]}},readdata[23:16]} : (instr_opcode == OPCODE_LB & addresstemp[1:0] == 2'b11) ? {{24{readdata[31]}},readdata[31:24]}
+                            :(instr_opcode == OPCODE_LBU & addresstemp[1:0] == 2'b00) ? {24'b0,readdata[7:0]} : (instr_opcode == OPCODE_LBU & addresstemp[1:0] == 2'b01) ? {24'b0,readdata[15:8]} : (instr_opcode == OPCODE_LBU & addresstemp[1:0] == 2'b10) ? {24'b0,readdata[23:16]} : (instr_opcode == OPCODE_LBU & addresstemp[1:0] == 2'b11) ? {24'b0,readdata[31:24]}
+                            :(instr_opcode == OPCODE_LH & addresstemp[1:0] == 2'b00)  ? {{16{readdata[15]}},readdata[15:0]} : (instr_opcode == OPCODE_LH & addresstemp[1:0] == 2'b10) ? {{16{readdata[31]}},readdata[31:16]}
+                            :(instr_opcode == OPCODE_LHU & addresstemp[1:0] == 2'b00)  ? {16'b0,readdata[15:0]} : (instr_opcode == OPCODE_LHU & addresstemp[1:0] == 2'b10) ? {16'b0,readdata[31:16]}
                             :(instr_opcode == OPCODE_LW)  ? readdata
-                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 0) ? {readdata[7:0],regRdDataB[23:0]}
-                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 1) ? {readdata[15:0],regRdDataB[15:0]}
-                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 2) ? {readdata[23:0],regRdDataB[7:0]}
-                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 3) ? readdata
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 0) ? readdata
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 1) ? {regRdDataB[31:24],readdata[23:0]}
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 2) ? {regRdDataB[31:16],readdata[15:0]}
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 3) ? {regRdDataB[31:8],readdata[7:0]}
-                            :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL)))) ? PC+8
+                            :(instr_opcode == OPCODE_LWL & addressend[1:0] == 0) ? {readdata[7:0],regRdDataB[23:0]}
+                            :(instr_opcode == OPCODE_LWL & addressend[1:0] == 1) ? {readdata[15:0],regRdDataB[15:0]}
+                            :(instr_opcode == OPCODE_LWL & addressend[1:0] == 2) ? {readdata[23:0],regRdDataB[7:0]}
+                            :(instr_opcode == OPCODE_LWL & addressend[1:0] == 3) ? readdata
+                            :(instr_opcode == OPCODE_LWR & addressend[1:0] == 0) ? readdata
+                            :(instr_opcode == OPCODE_LWR & addressend[1:0] == 1) ? {regRdDataB[31:24],readdata[31:8]}
+                            :(instr_opcode == OPCODE_LWR & addressend[1:0] == 2) ? {regRdDataB[31:16],readdata[31:16]}
+                            :(instr_opcode == OPCODE_LWR & addressend[1:0] == 3) ? {regRdDataB[31:8],readdata[31:24]}
+                            :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL) && branch == 1))) ? PC+8
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFHI) ? HI
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFLO) ? LO
                             :ALUOut;
@@ -493,7 +505,7 @@ module mips_cpu_bus(
             end else if(instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU)) begin
                 HI <= DivRemainder;
                 LO <= DivQuotient;
-            end 
+            end
             if (branch == 1) begin
                 branch <=2;
                 PC <= PC_increment;
@@ -527,8 +539,8 @@ module mips_cpu_bus(
     );
     mips_cpu_divider DivInst(
         .clk(clk), .start(DivStart), .sign(DivSign),
-        .Dividend(ALUInA), .Divisor(ALUInB), 
-        .Quotient(DivQuotient), .Remainder(DivRemainder), 
+        .Dividend(ALUInA), .Divisor(ALUInB),
+        .Quotient(DivQuotient), .Remainder(DivRemainder),
         .done(DivDone), .dbz(DivDbz), .reset(DivReset)
     );
 

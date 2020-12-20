@@ -22,13 +22,13 @@ module mips_cpu_bus_tb;
 
     assign RAMaddress = CPUaddress - 32'hBFC00000;
 
-    mips_cpu_bus_tb_memory #(RAM_INIT_FILE) ramInst(.clk(clk), .write(write), .read(read), 
+    mips_cpu_bus_tb_memory #(RAM_INIT_FILE) ramInst(.clk(clk), .write(write), .read(read),
         .writedata(writedata), .addr(RAMaddress), .byteenable(byteenable),
         .waitrequest(waitrequest), .readdata(readdata)
     ); //would initialise a ram module
 
     mips_cpu_bus cpuInst(.clk(clk), .reset(reset), .active(active), .waitrequest(waitrequest),
-        .address(CPUaddress), .write(write), .read(read), 
+        .address(CPUaddress), .write(write), .read(read),
         .writedata(writedata), .readdata(readdata), .byteenable(byteenable),
         .register_v0(register_v0)
     ); // initialise a mips cpu module
@@ -64,15 +64,15 @@ module mips_cpu_bus_tb;
         else $display("TB : CPU did not set active=1 after reset.");
 
         while (active) begin
-            if((CPUaddress<32'hBFC00000 || CPUaddress > 32'hBFC07FFF ) && (write||read) && CPUaddress != 32'b0) begin
-                $fatal(2, "Test accessed memory address %h outside of range", CPUaddress);
+            @(negedge clk)begin
             end
-            @(posedge clk)begin
+            if((CPUaddress<32'hBFC00000 || CPUaddress > 32'hBFC07FFF ) && (write||read) && CPUaddress != 32'b0) begin
+              //  $fatal(2, "Test accessed memory address %h outside of range", CPUaddress);
             end
         end
         $display("TB : Register V0 has %h",register_v0);
         $display("TB : finished; active=0");
-        
+
 
         $finish;
 
