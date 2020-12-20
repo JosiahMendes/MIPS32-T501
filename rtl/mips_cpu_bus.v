@@ -42,9 +42,8 @@ module mips_cpu_bus(
     wire [4:0]  I_instr_rt          = instr[20:16];
     wire [15:0] I_instr_immediate   = instr[15:0];
 
-    logic [31:0] exImmediate;
-    assign exImmediate = {{16{I_instr_immediate[15]}}, I_instr_immediate};
-
+    reg [31:0] exImmediate;
+    reg [31:0] zeroImmediate;
     // J-format instruction sub-sections
     wire [25:0]  J_instr_addr        = instr[25:0];
 
@@ -261,6 +260,8 @@ module mips_cpu_bus(
             regRdA <= readdata[25:21];
             regRdB <= readdata[20:16];
             instr <= readdata;
+            exImmediate <= {{16{readdata[15]}}, readdata[15:0]};
+            zeroImmediate <= {16'd0,readdata[15:0]};
             //Done
         end
         if (state==EXEC) begin
@@ -268,7 +269,7 @@ module mips_cpu_bus(
             state <= MEM;
             ALUInA <= regRdDataA;
 
-            ALUInB <= (ALUSrc == 2'b00) ? {16'b0, I_instr_immediate} : (ALUSrc == 2'b11) ? exImmediate :regRdDataB;
+            ALUInB <= (ALUSrc == 2'b00) ? zeroImmediate : (ALUSrc == 2'b11) ? exImmediate :regRdDataB;
             case (instr_opcode)//Add case statements
                 OPCODE_ADDIU: begin
                     ALUop <= ALU_ADD;
