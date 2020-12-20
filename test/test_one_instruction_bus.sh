@@ -8,6 +8,9 @@ INSTR="$2"
 #check if testcases for instruction exist
 if test -d "test/testcases/${INSTR}" ; then
     #loop through every testcases available
+    rm -f test/testcases/*_MEM*
+    rm -f test/testcases/${INSTR}/*.stdout
+    rm -f test/testcases/${INSTR}/*.vcd
     TESTCASES="test/testcases/${INSTR}/*.asm"
     for i in ${TESTCASES} ; do
 
@@ -17,10 +20,7 @@ if test -d "test/testcases/${INSTR}" ; then
         >&2 echo "  Running Test ${TESTNAME}"
         >&2 echo "    1 - Assembling input file"
 
-        rm -f test/testcases/${INSTR}/${TESTNAME}_MEM.txt
-        rm -f test/testcases/*_MEM*
-        rm -f test/testcases/${INSTR}/${TESTNAME}.stdout
-        rm -f test/testcases/${INSTR}/${TESTNAME}.vcd
+        rm -f test/testcases/${INSTR}/${TESTNAME}_MEM*.txt
 
         var=$(< test/testcases/${INSTR}/${TESTNAME}.ref)
         fail="FAIL"

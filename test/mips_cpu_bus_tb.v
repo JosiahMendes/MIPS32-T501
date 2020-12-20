@@ -39,11 +39,12 @@ module mips_cpu_bus_tb;
         $dumpfile("Simulation.vcd");
         $dumpvars(0, mips_cpu_bus_tb);
         clk=0;
+        #5
 
         repeat (TIMEOUT_CYCLES) begin
-            #10;
+            #5;
             clk = !clk;
-            #10;
+            #5;
             clk = !clk;
         end
 
