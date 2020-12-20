@@ -42,6 +42,16 @@ module mips_cpu_bus_tb_memory
                     memory[addr+2]<=writedata[23:16];
                     memory[addr+3]<=writedata[31:24];
                 end
+                4'b0111: begin
+                    memory[addr]<=writedata[7:0];
+                    memory[addr+1]<=writedata[15:8];
+                    memory[addr+2]<=writedata[23:16];
+                end
+                4'b1110: begin
+                    memory[addr]<=writedata[15:8];
+                    memory[addr+1]<=writedata[23:16];
+                    memory[addr+2]<=writedata[31:24];
+                end
                 4'b0011: begin
                     memory[addr]<=writedata[7:0];
                     memory[addr+1]<=writedata[15:8];
@@ -49,6 +59,10 @@ module mips_cpu_bus_tb_memory
                 4'b1100: begin
                     memory[addr]<=writedata[23:16];
                     memory[addr+1]<=writedata[31:24];
+                end
+                4'b0110: begin
+                    memory[addr]<=writedata[15:8];
+                    memory[addr+1]<=writedata[23:16];
                 end
                 4'b0001:begin
                     memory[addr]<=writedata[7:0];
@@ -73,10 +87,28 @@ module mips_cpu_bus_tb_memory
                     readdata[23:16]<=memory[addr+2];
                     readdata[31:24]<=memory[addr+3];
                 end
+                4'b0111: begin
+                    readdata[7:0]<=memory[addr];
+                    readdata[15:8]<=memory[addr+1];
+                    readdata[23:16]<=memory[addr+2];
+                    readdata[31:24]<=0;
+                end
+                4'b1110: begin
+                    readdata[7:0]<=0;
+                    readdata[15:8]<=memory[addr+0];
+                    readdata[23:16]<=memory[addr+1];
+                    readdata[31:24]<=memory[addr+2];
+                end
                 4'b0011: begin
                     readdata[7:0]<=memory[addr];
                     readdata[15:8]<=memory[addr+1];
                     readdata[31:16]<=0;
+                end
+                4'b0110: begin
+                    readdata[7:0]<=0;
+                    readdata[15:8]<=memory[addr+1];
+                    readdata[23:16]<=memory[addr+2];
+                    readdata[31:24]<=0;
                 end
                 4'b1100: begin
                     readdata[23:16]<=memory[addr+2];
