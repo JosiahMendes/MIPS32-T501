@@ -491,7 +491,7 @@ module mips_cpu_bus(
                             :(instr_opcode == OPCODE_LWR & addressend[1:0] == 1) ? {regRdDataB[31:24],readdata[31:8]}
                             :(instr_opcode == OPCODE_LWR & addressend[1:0] == 2) ? {regRdDataB[31:16],readdata[31:16]}
                             :(instr_opcode == OPCODE_LWR & addressend[1:0] == 3) ? {regRdDataB[31:8],readdata[31:24]}
-                            :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL) && branch == 1))) ? PC+8
+                            :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL)))) ? PC+8
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFHI) ? HI
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFLO) ? LO
                             :ALUOut;
