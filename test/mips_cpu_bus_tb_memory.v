@@ -33,7 +33,9 @@ module mips_cpu_bus_tb_memory
 
     always @(posedge clk) begin
         if(write && !read) begin
-            $display("Writing %h to Memory Address %h", writedata, addr);
+            if(addr[1:0] != 2'b00) begin
+                $fatal(1,"Attempted to Write to Non Aligned Address");
+            end
             readdata <= 32'bx;
             case(byteenable)
                 4'b1111: begin
@@ -48,38 +50,41 @@ module mips_cpu_bus_tb_memory
                     memory[addr+2]<=writedata[23:16];
                 end
                 4'b1110: begin
-                    memory[addr]<=writedata[15:8];
-                    memory[addr+1]<=writedata[23:16];
-                    memory[addr+2]<=writedata[31:24];
+                    memory[addr+1]<=writedata[15:8];
+                    memory[addr+2]<=writedata[23:16];
+                    memory[addr+3]<=writedata[31:24];
                 end
                 4'b0011: begin
                     memory[addr]<=writedata[7:0];
                     memory[addr+1]<=writedata[15:8];
                 end
                 4'b1100: begin
-                    memory[addr]<=writedata[23:16];
-                    memory[addr+1]<=writedata[31:24];
+                    memory[addr+2]<=writedata[23:16];
+                    memory[addr+3]<=writedata[31:24];
                 end
                 4'b0110: begin
-                    memory[addr]<=writedata[15:8];
-                    memory[addr+1]<=writedata[23:16];
+                    memory[addr+1]<=writedata[15:8];
+                    memory[addr+2]<=writedata[23:16];
                 end
                 4'b0001:begin
                     memory[addr]<=writedata[7:0];
                 end
                 4'b0010:begin
-                    memory[addr]<=writedata[15:8];
+                    memory[addr+1]<=writedata[15:8];
                 end
                 4'b0100:begin
-                    memory[addr]<=writedata[23:16];
+                    memory[addr+2]<=writedata[23:16];
                 end
                 4'b1000:begin
-                    memory[addr]<=writedata[31:24];
+                    memory[addr+3]<=writedata[31:24];
                 end
-                default: begin 
+                default: begin
                 end
             endcase
-        end else if(read && !write)begin
+        end else if(read && !write) begin
+            if(addr[1:0] != 2'b00) begin
+                $fatal(1,"Attempted to Read from Non Aligned Address");
+            end
             case(byteenable)
                 4'b1111: begin
                     readdata[7:0]<=memory[addr];
@@ -95,9 +100,9 @@ module mips_cpu_bus_tb_memory
                 end
                 4'b1110: begin
                     readdata[7:0]<=0;
-                    readdata[15:8]<=memory[addr+0];
-                    readdata[23:16]<=memory[addr+1];
-                    readdata[31:24]<=memory[addr+2];
+                    readdata[15:8]<=memory[addr+1];
+                    readdata[23:16]<=memory[addr+2];
+                    readdata[31:24]<=memory[addr+3];
                 end
                 4'b0011: begin
                     readdata[7:0]<=memory[addr];
@@ -111,9 +116,9 @@ module mips_cpu_bus_tb_memory
                     readdata[31:24]<=0;
                 end
                 4'b1100: begin
+                    readdata[15:0]<=0;
                     readdata[23:16]<=memory[addr+2];
                     readdata[31:24]<=memory[addr+3];
-                    readdata[15:0]<=0;
                 end
                 4'b0001:begin
                      readdata[7:0]<=memory[addr];
@@ -135,7 +140,7 @@ module mips_cpu_bus_tb_memory
                 end
                 default: begin
                 end
-                endcase 
+                endcase
         end else begin
             readdata <= 32'bx;
         end

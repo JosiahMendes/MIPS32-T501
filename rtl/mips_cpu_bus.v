@@ -42,8 +42,9 @@ module mips_cpu_bus(
     wire [4:0]  I_instr_rt          = instr[20:16];
     wire [15:0] I_instr_immediate   = instr[15:0];
 
-    reg [31:0] exImmediate;
-    reg [31:0] zeroImmediate;
+    logic [31:0] exImmediate;
+    assign exImmediate = {{16{I_instr_immediate[15]}}, I_instr_immediate};
+
     // J-format instruction sub-sections
     wire [25:0]  J_instr_addr        = instr[25:0];
 
@@ -260,8 +261,6 @@ module mips_cpu_bus(
             regRdA <= readdata[25:21];
             regRdB <= readdata[20:16];
             instr <= readdata;
-            exImmediate <= {{16{readdata[15]}}, readdata[15:0]};
-            zeroImmediate <= {16'd0,readdata[15:0]};
             //Done
         end
         if (state==EXEC) begin
@@ -269,7 +268,7 @@ module mips_cpu_bus(
             state <= MEM;
             ALUInA <= regRdDataA;
 
-            ALUInB <= (ALUSrc == 2'b00) ? zeroImmediate : (ALUSrc == 2'b11) ? exImmediate :regRdDataB;
+            ALUInB <= (ALUSrc == 2'b00) ? {16'b0, I_instr_immediate} : (ALUSrc == 2'b11) ? exImmediate :regRdDataB;
             case (instr_opcode)//Add case statements
                 OPCODE_ADDIU: begin
                     ALUop <= ALU_ADD;
@@ -491,7 +490,7 @@ module mips_cpu_bus(
                             :(instr_opcode == OPCODE_LWR & addressend[1:0] == 1) ? {regRdDataB[31:24],readdata[31:8]}
                             :(instr_opcode == OPCODE_LWR & addressend[1:0] == 2) ? {regRdDataB[31:16],readdata[31:16]}
                             :(instr_opcode == OPCODE_LWR & addressend[1:0] == 3) ? {regRdDataB[31:8],readdata[31:24]}
-                            :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL)))) ? PC+8
+                            :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL) && branch == 1))) ? PC+8
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFHI) ? HI
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFLO) ? LO
                             :ALUOut;
