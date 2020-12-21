@@ -3,7 +3,7 @@ module mips_cpu_bus_tb;
 
     parameter RAM_INIT_FILE = "...";  // RAM INITIALISATION insert file between " "
     parameter TEST_NAME = "...";
-    parameter TIMEOUT_CYCLES = 1000; // TIME OUT PROGRAM AT 10000 CYCLES
+    parameter TIMEOUT_CYCLES = 100000; // TIME OUT PROGRAM AT 10000 CYCLES
 
     logic clk;
     logic reset;
