@@ -1,0 +1,4 @@
+lui t1 0xbfc0
+addiu t1 t1 0x1
+jr r0
+lw v0 0xffff(t1)
