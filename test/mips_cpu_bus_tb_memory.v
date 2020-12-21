@@ -31,7 +31,9 @@ module mips_cpu_bus_tb_memory
         end
     end
 
+
     always @(posedge clk) begin
+        waitrequest = $urandom_range(0,1);
         if(write && !read) begin
             if(addr[1:0] != 2'b00) begin
                 $fatal(1,"Attempted to Write to Non Aligned Address");
