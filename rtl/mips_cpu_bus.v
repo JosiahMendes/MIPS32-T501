@@ -155,11 +155,17 @@ module mips_cpu_bus(
     //HI LO
     reg [31:0] HI, LO;
 
+    //Reset all modules
+    logic moduleReset;
+    assign moduleReset = (reset) ? 1:0;
+
     //Register Connections
-    assign regReset = (reset) ? 1 :0;
-    logic regWriteEn, regReset;
+    logic regWriteEn;
     logic [4:0]  regDest, regRdA,     regRdB;
     reg [31:0] regDestData, regRdDataA, regRdDataB;
+    logic[31:0] regBLSB,regBLSH;
+    assign regBLSB = {4{regRdDataB[7:0]}};
+    assign regBLSH = {2{regRdDataB[15:0]}};
 
     logic regWriteEnable;
 
@@ -182,38 +188,52 @@ module mips_cpu_bus(
                     :(instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE || instr_opcode == OPCODE_REGIMM)? regRdDataB
                     : exImmediate;
     assign ALUInA = regRdDataA;
+
+
     //Multiplier Connections
     reg [63:0] MultOut;
     logic MultSign;
 
     //Divider Connections
     logic [31:0] DivQuotient, DivRemainder;
-    logic DivStart, DivReset, DivDone, DivDbz, DivSign;
+    logic DivStart, DivDone, DivDbz, DivSign;
 
-    assign DivReset = (reset) ? 1:0;
     assign DivStart = (state == EXEC && instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU)) ? 1:0;
 
     assign DivSign = (instr_opcode == OPCODE_R && R_instr_func == FUNC_DIV) ? 1'b1 :1'b0;
 
 
     //Memory Control
-    assign address =    (state == INSTR_FETCH) ? PC
-                        :(state == MEM && instr_opcode == OPCODE_LWL) ? {ALUOut[31:2],2'd0}
-                        : ALUOut;
+    logic [31:0] addresstemp;
+    logic [3:0] bytetranslate;
+
+
+    assign bytetranslate = (addresstemp[1:0] == 2'b00) ? 4'b0001 : (addresstemp[1:0] == 2'b01) ? 4'b0010 : (addresstemp[1:0] == 2'b10) ? 4'b0100 : (addresstemp[1:0] == 2'b11) ? 4'b1000 : 4'b1111 ;
+    assign addresstemp = (state == INSTR_FETCH) ? PC : ALUOut;
+    assign address = {addresstemp[31:2],2'd0};
+
     assign read =   (state==INSTR_FETCH || (state == MEM &&
                                         (((instr_opcode == OPCODE_LH||instr_opcode == OPCODE_LHU) &&  ALUOut[0] == 0)
                                         ||(instr_opcode == OPCODE_LW && ALUOut[0] == 0 && ALUOut[1] == 0)
                                         ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LWR
                                         ||instr_opcode == OPCODE_LB||instr_opcode == OPCODE_LBU))
                     ) ? 1'b1 : 1'b0;
-    assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW ||  instr_opcode == OPCODE_LWL || instr_opcode == OPCODE_LWR ||instr_opcode == OPCODE_SW))) ? 4'b1111
-                        : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? 4'b0001
-                        : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH)) ? 4'b0011
+    assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW ||  instr_opcode == OPCODE_LWL || instr_opcode == OPCODE_LWR ||instr_opcode == OPCODE_SW) && addresstemp[1:0] == 2'b00)) ? 4'b1111
+                        : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? bytetranslate
+                        : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH) & addresstemp[1:0] == 2'b00) ? 4'b0011 
+                        : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH) & addresstemp[1:0] == 2'b10) ? 4'b1100
                         : 4'b0000;
     assign write =  (state == MEM &&    (instr_opcode == OPCODE_SW || instr_opcode == OPCODE_SB
                                         ||instr_opcode == OPCODE_SH)
                     ) ? 1'b1 :1'b0;
-    assign writedata = regRdDataB;
+    assign writedata =  (instr_opcode == OPCODE_SW  && addresstemp[1:0] == 2'b00) ? regRdDataB 
+                        :(instr_opcode == OPCODE_SH && addresstemp[1:0] == 2'b00) ? 32'h0000FFFF & regBLSH
+                        :(instr_opcode == OPCODE_SH && addresstemp[1:0] == 2'b10) ? 32'hFFFF0000 & regBLSH
+                        :(instr_opcode == OPCODE_SB && addresstemp[1:0] == 2'b00) ? 32'h000000FF & regBLSB
+                        :(instr_opcode == OPCODE_SB && addresstemp[1:0] == 2'b01) ? 32'h0000FF00 & regBLSB
+                        :(instr_opcode == OPCODE_SB && addresstemp[1:0] == 2'b10) ? 32'h00FF0000 & regBLSB
+                        :(instr_opcode == OPCODE_SB && addresstemp[1:0] == 2'b11) ? 32'hFF000000 & regBLSB
+                        :32'b0;
 
     //Branch Delay Slot Handling
     reg [2:0] branch;
@@ -332,20 +352,20 @@ module mips_cpu_bus(
             regDest <= (instr_opcode == OPCODE_JAL || (instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR && R_instr_rd == 0)||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL) )) ? 5'd31
                         :(instr_opcode == OPCODE_R) ? R_instr_rd
                         :I_instr_rt;
-            regDestData <=  (instr_opcode == OPCODE_LB)   ? {{24{readdata[7]}},readdata[7:0]}
-                            :(instr_opcode == OPCODE_LBU) ? {{24'd0,readdata[7:0]}}
-                            :(instr_opcode == OPCODE_LH)  ? {{16{readdata[15]}},readdata[15:0]}
-                            :(instr_opcode == OPCODE_LHU) ? {{16'd0,readdata[15:0]}}
+             regDestData <=  (instr_opcode == OPCODE_LB & addresstemp[1:0] == 2'b00) ? {{24{readdata[7]}},readdata[7:0]} : (instr_opcode == OPCODE_LB & addresstemp[1:0] == 2'b01) ? {{24{readdata[15]}},readdata[15:8]} : (instr_opcode == OPCODE_LB & addresstemp[1:0] == 2'b10) ? {{24{readdata[23]}},readdata[23:16]} : (instr_opcode == OPCODE_LB & addresstemp[1:0] == 2'b11) ? {{24{readdata[31]}},readdata[31:24]}
+                            :(instr_opcode == OPCODE_LBU & addresstemp[1:0] == 2'b00) ? {24'b0,readdata[7:0]} : (instr_opcode == OPCODE_LBU & addresstemp[1:0] == 2'b01) ? {24'b0,readdata[15:8]} : (instr_opcode == OPCODE_LBU & addresstemp[1:0] == 2'b10) ? {24'b0,readdata[23:16]} : (instr_opcode == OPCODE_LBU & addresstemp[1:0] == 2'b11) ? {24'b0,readdata[31:24]}
+                            :(instr_opcode == OPCODE_LH & addresstemp[1:0] == 2'b00)  ? {{16{readdata[15]}},readdata[15:0]} : (instr_opcode == OPCODE_LH & addresstemp[1:0] == 2'b10) ? {{16{readdata[31]}},readdata[31:16]}
+                            :(instr_opcode == OPCODE_LHU & addresstemp[1:0] == 2'b00)  ? {16'b0,readdata[15:0]} : (instr_opcode == OPCODE_LHU & addresstemp[1:0] == 2'b10) ? {16'b0,readdata[31:16]}
                             :(instr_opcode == OPCODE_LW)  ? readdata
-                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 0) ? {readdata[7:0],regRdDataB[23:0]}
-                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 1) ? {readdata[15:0],regRdDataB[15:0]}
-                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 2) ? {readdata[23:0],regRdDataB[7:0]}
-                            :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 3) ? readdata
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 0) ? readdata
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 1) ? {regRdDataB[31:24],readdata[31:8]}
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 2) ? {regRdDataB[31:16],readdata[31:16]}
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 3) ? {regRdDataB[31:8],readdata[31:24]}
-                            :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL) ))) ? PC+8
+                            :(instr_opcode == OPCODE_LWL & addresstemp[1:0] == 0) ? {readdata[7:0],regRdDataB[23:0]}
+                            :(instr_opcode == OPCODE_LWL & addresstemp[1:0] == 1) ? {readdata[15:0],regRdDataB[15:0]}
+                            :(instr_opcode == OPCODE_LWL & addresstemp[1:0] == 2) ? {readdata[23:0],regRdDataB[7:0]}
+                            :(instr_opcode == OPCODE_LWL & addresstemp[1:0] == 3) ? readdata
+                            :(instr_opcode == OPCODE_LWR & addresstemp[1:0] == 0) ? readdata
+                            :(instr_opcode == OPCODE_LWR & addresstemp[1:0] == 1) ? {regRdDataB[31:24],readdata[31:8]}
+                            :(instr_opcode == OPCODE_LWR & addresstemp[1:0] == 2) ? {regRdDataB[31:16],readdata[31:16]}
+                            :(instr_opcode == OPCODE_LWR & addresstemp[1:0] == 3) ? {regRdDataB[31:8],readdata[31:24]}
+                            :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL)))) ? PC+8
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFHI) ? HI
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFLO) ? LO
                             :ALUOut;
@@ -378,7 +398,7 @@ module mips_cpu_bus(
     end
 
     mips_cpu_registers registerInst(
-        .clk(clk), .write(regWriteEn), .reset(regReset),
+        .clk(clk), .write(regWriteEn), .reset(moduleReset),
         .wrAddr(regDest), .wrData(regDestData),
         .rdAddrA(readdata[25:21]), .rdDataA(regRdDataA),
         .rdAddrB(readdata[20:16]), .rdDataB(regRdDataB),
@@ -386,16 +406,16 @@ module mips_cpu_bus(
     );
     mips_cpu_ALU ALUInst(
         .op(ALUop), .a(ALUInA), .b(ALUInB),
-        .result(ALUOut), .zero(ALUZero), .sa(shiftamount), .clk(clk)
+        .result(ALUOut), .zero(ALUZero), .sa(shiftamount), .clk(clk), .reset(moduleReset)
     );
     mips_cpu_multiplier MultInst(
-        .a(regRdDataA), .b(regRdDataB), .out(MultOut), .sign(MultSign), .clk(clk)
+        .a(regRdDataA), .b(regRdDataB), .out(MultOut), .sign(MultSign), .clk(clk), .reset(moduleReset)
     );
     mips_cpu_divider DivInst(
         .clk(clk), .start(DivStart), .sign(DivSign),
         .Dividend(regRdDataA), .Divisor(regRdDataB), 
         .Quotient(DivQuotient), .Remainder(DivRemainder), 
-        .done(DivDone), .dbz(DivDbz), .reset(DivReset)
+        .done(DivDone), .dbz(DivDbz), .reset(moduleReset)
     );
 
 endmodule

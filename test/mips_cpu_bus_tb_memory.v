@@ -48,33 +48,33 @@ module mips_cpu_bus_tb_memory
                     memory[addr+2]<=writedata[23:16];
                 end
                 4'b1110: begin
-                    memory[addr]<=writedata[15:8];
-                    memory[addr+1]<=writedata[23:16];
-                    memory[addr+2]<=writedata[31:24];
+                    memory[addr+1]<=writedata[15:8];
+                    memory[addr+2]<=writedata[23:16];
+                    memory[addr+3]<=writedata[31:24];
                 end
                 4'b0011: begin
                     memory[addr]<=writedata[7:0];
                     memory[addr+1]<=writedata[15:8];
                 end
                 4'b1100: begin
-                    memory[addr]<=writedata[23:16];
-                    memory[addr+1]<=writedata[31:24];
+                    memory[addr+2]<=writedata[23:16];
+                    memory[addr+3]<=writedata[31:24];
                 end
                 4'b0110: begin
-                    memory[addr]<=writedata[15:8];
-                    memory[addr+1]<=writedata[23:16];
+                    memory[addr+1]<=writedata[15:8];
+                    memory[addr+2]<=writedata[23:16];
                 end
                 4'b0001:begin
                     memory[addr]<=writedata[7:0];
                 end
                 4'b0010:begin
-                    memory[addr]<=writedata[15:8];
+                    memory[addr+1]<=writedata[15:8];
                 end
                 4'b0100:begin
-                    memory[addr]<=writedata[23:16];
+                    memory[addr+2]<=writedata[23:16];
                 end
                 4'b1000:begin
-                    memory[addr]<=writedata[31:24];
+                    memory[addr+3]<=writedata[31:24];
                 end
                 default: begin 
                 end

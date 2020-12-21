@@ -5,7 +5,8 @@ module mips_cpu_ALU (
   input logic [4:0] sa,
   output logic [31:0] result,
   output logic zero,
-  input logic clk
+  input logic clk,
+  input logic reset
 
 );
 
@@ -18,6 +19,9 @@ module mips_cpu_ALU (
 
 
   always_ff @(posedge clk) begin
+    if(reset) begin
+      result <= 0;
+    end else begin
     case (op)
       0: begin result <= a & b; end //bitwise AND
       1: begin result <= a | b; end //bitwise OR
@@ -37,6 +41,7 @@ module mips_cpu_ALU (
       default: begin end
 
     endcase
+  end
   end
 
 endmodule
