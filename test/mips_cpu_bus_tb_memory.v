@@ -16,12 +16,15 @@ module mips_cpu_bus_tb_memory
     parameter RAM_INIT_FILE ="";
 
     reg[7:0] memory [0:32767];
+    logic Team5;
 
     initial begin
         integer i;
         for (i = 0; i<32768; i++)begin
             memory[i] = 0;
         end
+        waitrequest = 0;
+        Team5 = 0;
         if (RAM_INIT_FILE != "") begin
             $display("RAM : INIT : Loading RAM contents from %s", RAM_INIT_FILE);
             $readmemh(RAM_INIT_FILE, memory);
@@ -31,12 +34,23 @@ module mips_cpu_bus_tb_memory
     always @(posedge clk) begin
         if(write && !read) begin
             $display("Writing %h to Memory Address %h", writedata, addr);
+            readdata <= 32'bx;
             case(byteenable)
                 4'b1111: begin
                     memory[addr]<=writedata[7:0];
                     memory[addr+1]<=writedata[15:8];
                     memory[addr+2]<=writedata[23:16];
                     memory[addr+3]<=writedata[31:24];
+                end
+                4'b0111: begin
+                    memory[addr]<=writedata[7:0];
+                    memory[addr+1]<=writedata[15:8];
+                    memory[addr+2]<=writedata[23:16];
+                end
+                4'b1110: begin
+                    memory[addr]<=writedata[15:8];
+                    memory[addr+1]<=writedata[23:16];
+                    memory[addr+2]<=writedata[31:24];
                 end
                 4'b0011: begin
                     memory[addr]<=writedata[7:0];
@@ -45,6 +59,10 @@ module mips_cpu_bus_tb_memory
                 4'b1100: begin
                     memory[addr]<=writedata[23:16];
                     memory[addr+1]<=writedata[31:24];
+                end
+                4'b0110: begin
+                    memory[addr]<=writedata[15:8];
+                    memory[addr+1]<=writedata[23:16];
                 end
                 4'b0001:begin
                     memory[addr]<=writedata[7:0];
@@ -61,8 +79,7 @@ module mips_cpu_bus_tb_memory
                 default: begin 
                 end
             endcase
-        end
-        if(read && !write)begin
+        end else if(read && !write)begin
             case(byteenable)
                 4'b1111: begin
                     readdata[7:0]<=memory[addr];
@@ -70,10 +87,28 @@ module mips_cpu_bus_tb_memory
                     readdata[23:16]<=memory[addr+2];
                     readdata[31:24]<=memory[addr+3];
                 end
+                4'b0111: begin
+                    readdata[7:0]<=memory[addr];
+                    readdata[15:8]<=memory[addr+1];
+                    readdata[23:16]<=memory[addr+2];
+                    readdata[31:24]<=0;
+                end
+                4'b1110: begin
+                    readdata[7:0]<=0;
+                    readdata[15:8]<=memory[addr+0];
+                    readdata[23:16]<=memory[addr+1];
+                    readdata[31:24]<=memory[addr+2];
+                end
                 4'b0011: begin
                     readdata[7:0]<=memory[addr];
                     readdata[15:8]<=memory[addr+1];
                     readdata[31:16]<=0;
+                end
+                4'b0110: begin
+                    readdata[7:0]<=0;
+                    readdata[15:8]<=memory[addr+1];
+                    readdata[23:16]<=memory[addr+2];
+                    readdata[31:24]<=0;
                 end
                 4'b1100: begin
                     readdata[23:16]<=memory[addr+2];
@@ -101,6 +136,9 @@ module mips_cpu_bus_tb_memory
                 default: begin
                 end
                 endcase 
+        end else begin
+            readdata <= 32'bx;
         end
+
     end
 endmodule

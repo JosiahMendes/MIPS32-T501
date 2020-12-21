@@ -37,10 +37,8 @@ module mips_cpu_bus(
     wire [15:0] I_instr_immediate   = instr[15:0];
 
     logic [31:0] exImmediate, zeroImmediate;
-    assign exImmediate = {{16{readdata[15]}}, readdata[15:0]};
-    assign zeroImmediate={16'b0, readdata[15:0]};
 	 
-	 wire [4:0] shiftamount = readdata[10:6];
+	logic [4:0] shiftamount;
     
 
     // J-format instruction sub-sections
@@ -162,10 +160,8 @@ module mips_cpu_bus(
     logic regReset;
     logic regWriteEn;
     logic [4:0]  regDest;
-    wire  [4:0] regRdA,     regRdB;
-	 assign regRdA = readdata[25:21];
-	 assign regRdB = readdata[20:16];
-    logic [31:0] regDestData, regRdDataA, regRdDataB;
+    logic  [4:0] regRdA,     regRdB;
+    reg [31:0] regDestData, regRdDataA, regRdDataB;
 
     logic regWriteEnable;
 
@@ -181,8 +177,9 @@ module mips_cpu_bus(
 
     //ALU Connections
     logic [3:0] ALUop;
-    logic [31:0] ALUInA, ALUInB, ALUOut;
-    logic ALUZero;
+    logic [31:0] ALUInA, ALUInB;
+    reg [31:0] ALUOut;
+    reg ALUZero;
     logic [2:0] ALUSrc;
     assign ALUSrc = (instr_opcode == OPCODE_ORI ||  instr_opcode == OPCODE_XORI || instr_opcode == OPCODE_ANDI) ? 2'b00
                     :(instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE || instr_opcode == OPCODE_REGIMM)? 2'b01
@@ -191,32 +188,8 @@ module mips_cpu_bus(
                     :(ALUSrc == 2'b01) ? regRdDataB
                     : exImmediate;
     assign ALUInA = regRdDataA;
-    assign ALUop =  (readdata[31:26] == OPCODE_ANDI    || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_AND)) ? ALU_AND
-                    : (readdata[31:26] == OPCODE_ORI   || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_OR)) ? ALU_OR
-                    : (readdata[31:26] == OPCODE_XORI  || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_XOR)) ? ALU_XOR
-                    : (readdata[31:26] == OPCODE_SLTI  || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SLT)) ? ALU_SLT
-                    : (readdata[31:26] == OPCODE_SLTIU || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SLTU)) ? ALU_SLTU
-                    : (readdata[31:26] == OPCODE_BLEZ  || readdata[31:26] == OPCODE_BGTZ || (readdata[31:26] == OPCODE_REGIMM && (I_instr_rt == BGEZ || I_instr_rt == BGEZAL || I_instr_rt == BLTZ || I_instr_rt == BLTZAL))) ? ALU_A
-                    : (readdata[31:26] == OPCODE_BEQ   || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SUBU) || readdata[31:26] == OPCODE_BNE ) ? ALU_SUB
-                    : (readdata[31:26] == OPCODE_LUI) ? ALU_LUI
-                    : (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SRAV) ? ALU_SRAV
-                    : (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SRLV) ? ALU_SRLV
-                    : (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SLLV) ? ALU_SLLV
-                    : (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SRA) ? ALU_SRA
-                    : (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SLL) ? ALU_SLL
-                    : (readdata[31:26] == OPCODE_R && R_instr_func == FUNC_SRL) ? ALU_SRL
-                    : (
-                        readdata[31:26] == OPCODE_ADDIU || readdata[31:26] == OPCODE_LW  || readdata[31:26] == OPCODE_LB  || readdata[31:26] == OPCODE_LBU 
-                        || readdata[31:26] == OPCODE_LH || readdata[31:26] == OPCODE_LHU || readdata[31:26] == OPCODE_LWL || readdata[31:26] == OPCODE_LWR
-                        || readdata[31:26] == OPCODE_SW || readdata[31:26] == OPCODE_SH  || readdata[31:26] == OPCODE_SB  || 
-                        (
-                            instr_opcode == OPCODE_R && (readdata[5:0] == FUNC_ADDU || readdata[5:0] == FUNC_MTHI || readdata[5:0] == FUNC_MTLO)
-                        )
-                    ) ? ALU_ADD 
-                    : 4'b1111;
-
     //Multiplier Connections
-    logic [63:0] MultOut;
+    reg [63:0] MultOut;
     logic MultSign;
 
     //Divider Connections
@@ -279,6 +252,35 @@ module mips_cpu_bus(
             $display("CPU-DECODE      Instruction Fetched is %h,    reading from registers %d and %d ", readdata, readdata[25:21], readdata[20:16] );
             state <= EXEC;
             instr <= readdata;
+            regRdA <= readdata[25:21];
+            regRdB <= readdata[20:16];
+            exImmediate <= {{16{readdata[15]}}, readdata[15:0]};
+            zeroImmediate<={16'b0, readdata[15:0]};
+            shiftamount <= readdata[10:6];
+            ALUop <=  (readdata[31:26] == OPCODE_ANDI    || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_AND)) ? ALU_AND
+                    : (readdata[31:26] == OPCODE_ORI   || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_OR)) ? ALU_OR
+                    : (readdata[31:26] == OPCODE_XORI  || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_XOR)) ? ALU_XOR
+                    : (readdata[31:26] == OPCODE_SLTI  || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SLT)) ? ALU_SLT
+                    : (readdata[31:26] == OPCODE_SLTIU || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SLTU)) ? ALU_SLTU
+                    : (readdata[31:26] == OPCODE_BLEZ  || readdata[31:26] == OPCODE_BGTZ || (readdata[31:26] == OPCODE_REGIMM && (readdata[20:16] == BGEZ || readdata[20:16] == BGEZAL || readdata[20:16] == BLTZ || readdata[20:16] == BLTZAL))) ? ALU_A
+                    : (readdata[31:26] == OPCODE_BEQ   || (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SUBU) || readdata[31:26] == OPCODE_BNE ) ? ALU_SUB
+                    : (readdata[31:26] == OPCODE_LUI) ? ALU_LUI
+                    : (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SRAV) ? ALU_SRAV
+                    : (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SRLV) ? ALU_SRLV
+                    : (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SLLV) ? ALU_SLLV
+                    : (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SRA) ? ALU_SRA
+                    : (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SLL) ? ALU_SLL
+                    : (readdata[31:26] == OPCODE_R && readdata[5:0] == FUNC_SRL) ? ALU_SRL
+                    : (
+                        readdata[31:26] == OPCODE_ADDIU || readdata[31:26] == OPCODE_LW  || readdata[31:26] == OPCODE_LB  || readdata[31:26] == OPCODE_LBU 
+                        || readdata[31:26] == OPCODE_LH || readdata[31:26] == OPCODE_LHU || readdata[31:26] == OPCODE_LWL || readdata[31:26] == OPCODE_LWR
+                        || readdata[31:26] == OPCODE_SW || readdata[31:26] == OPCODE_SH  || readdata[31:26] == OPCODE_SB  || 
+                        (
+                            readdata[31:26] == OPCODE_R && (readdata[5:0] == FUNC_ADDU || readdata[5:0] == FUNC_MTHI || readdata[5:0] == FUNC_MTLO)
+                        )
+                    ) ? ALU_ADD 
+                    : 4'b1111;
+
         end
         if (state==EXEC) begin
             $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h      shiftamount", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate,R_instr_shamt);
@@ -361,9 +363,9 @@ module mips_cpu_bus(
                             :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 2) ? {readdata[23:0],regRdDataB[7:0]}
                             :(instr_opcode == OPCODE_LWL && ALUOut[1:0] == 3) ? readdata
                             :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 0) ? readdata
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 1) ? {regRdDataB[31:24],readdata[23:0]}
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 2) ? {regRdDataB[31:16],readdata[15:0]}
-                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 3) ? {regRdDataB[31:8],readdata[7:0]}
+                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 1) ? {regRdDataB[31:24],readdata[31:8]}
+                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 2) ? {regRdDataB[31:16],readdata[31:16]}
+                            :(instr_opcode == OPCODE_LWR && ALUOut[1:0] == 3) ? {regRdDataB[31:8],readdata[31:24]}
                             :(instr_opcode == OPCODE_JAL||(instr_opcode == OPCODE_R && R_instr_func == FUNC_JALR ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BLTZAL || I_instr_rt == BGEZAL) && branch == 1))) ? PC+8
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFHI) ? HI
                             :(instr_opcode == OPCODE_R && R_instr_func == FUNC_MFLO) ? LO
@@ -399,8 +401,8 @@ module mips_cpu_bus(
     mips_cpu_registers registerInst(
         .clk(clk), .write(regWriteEn), .reset(regReset),
         .wrAddr(regDest), .wrData(regDestData),
-        .rdAddrA(regRdA), .rdDataA(regRdDataA),
-        .rdAddrB(regRdB), .rdDataB(regRdDataB),
+        .rdAddrA(readdata[25:21]), .rdDataA(regRdDataA),
+        .rdAddrB(readdata[20:16]), .rdDataB(regRdDataB),
         .register_v0(register_v0)
     );
     mips_cpu_ALU ALUInst(
