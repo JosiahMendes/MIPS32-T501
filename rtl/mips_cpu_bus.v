@@ -18,7 +18,7 @@ module mips_cpu_bus(
 
 
     // This wire holds the whole instruction
-    logic[32-1:0] instr;
+    reg[31:0] instr;
 
     wire [5:0]  instr_opcode    = instr[31:26]; // This is common to all instruction formats
 
@@ -36,9 +36,8 @@ module mips_cpu_bus(
     wire [4:0]  I_instr_rt          = instr[20:16];
     wire [15:0] I_instr_immediate   = instr[15:0];
 
-    logic [31:0] exImmediate, zeroImmediate;
-	 
-	logic [4:0] shiftamount;
+    reg [31:0] exImmediate, zeroImmediate;
+	reg [4:0] shiftamount;
     
 
     // J-format instruction sub-sections
@@ -154,13 +153,12 @@ module mips_cpu_bus(
     assign PC_increment = PC+4;
 
     //HI LO
-    logic[31:0] HI, LO;
+    reg [31:0] HI, LO;
 
     //Register Connections
-    logic regReset;
-    logic regWriteEn;
-    logic [4:0]  regDest;
-    logic  [4:0] regRdA,     regRdB;
+    assign regReset = (reset) ? 1 :0;
+    logic regWriteEn, regReset;
+    logic [4:0]  regDest, regRdA,     regRdB;
     reg [31:0] regDestData, regRdDataA, regRdDataB;
 
     logic regWriteEnable;
@@ -180,12 +178,8 @@ module mips_cpu_bus(
     logic [31:0] ALUInA, ALUInB;
     reg [31:0] ALUOut;
     reg ALUZero;
-    logic [2:0] ALUSrc;
-    assign ALUSrc = (instr_opcode == OPCODE_ORI ||  instr_opcode == OPCODE_XORI || instr_opcode == OPCODE_ANDI) ? 2'b00
-                    :(instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE || instr_opcode == OPCODE_REGIMM)? 2'b01
-                    : 2'b11;
-    assign ALUInB = (ALUSrc == 2'b00) ? zeroImmediate
-                    :(ALUSrc == 2'b01) ? regRdDataB
+    assign ALUInB = (instr_opcode == OPCODE_ORI ||  instr_opcode == OPCODE_XORI || instr_opcode == OPCODE_ANDI) ? zeroImmediate
+                    :(instr_opcode == OPCODE_R || instr_opcode == OPCODE_J || instr_opcode == OPCODE_JAL || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE || instr_opcode == OPCODE_REGIMM)? regRdDataB
                     : exImmediate;
     assign ALUInA = regRdDataA;
     //Multiplier Connections
@@ -194,7 +188,10 @@ module mips_cpu_bus(
 
     //Divider Connections
     logic [31:0] DivQuotient, DivRemainder;
-    logic DivStart, DivDone, DivDbz, DivReset, DivSign;
+    logic DivStart, DivReset, DivDone, DivDbz, DivSign;
+
+    assign DivReset = (reset) ? 1:0;
+    assign DivStart = (state == EXEC && instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU)) ? 1:0;
 
     assign DivSign = (instr_opcode == OPCODE_R && R_instr_func == FUNC_DIV) ? 1'b1 :1'b0;
 
@@ -219,7 +216,7 @@ module mips_cpu_bus(
     assign writedata = regRdDataB;
 
     //Branch Delay Slot Handling
-    logic [2:0] branch;
+    reg [2:0] branch;
 
 
     // This is the simple state machine. The state switching is just drafted, and will depend on the individual instructions
@@ -227,13 +224,11 @@ module mips_cpu_bus(
         if (reset) begin
             $display("CPU Resetting");
             state <= INSTR_FETCH;
-            regReset <= 1;
             PC <= 32'hBFC00000;
             active<=1;
             branch <=0;
             HI <= 0;
             LO <= 0;
-            DivReset <=1;
         end
         if (state==INSTR_FETCH) begin
             $display("-------------------------------------------------------------------------------------------------------------PC = %h",PC);
@@ -242,8 +237,6 @@ module mips_cpu_bus(
                 active <= 0; state<=HALTED;
             end else if(waitrequest) begin
             end else begin state<=INSTR_DECODE; end
-            regReset <= 0;
-            DivReset <=0;
             regWriteEn<=0;
             
         end
@@ -285,43 +278,29 @@ module mips_cpu_bus(
         if (state==EXEC) begin
             $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h      shiftamount", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate,R_instr_shamt);
             state <= MEM;
-            case (instr_opcode)//Add case statements
-
-                OPCODE_J :begin
+            if (instr_opcode == OPCODE_J)begin
                     branch <= 1;
                     PC_temp <= {PC_increment[31:28],J_instr_addr, 2'd0};
-                end
-                OPCODE_JAL: begin
+            end else if(instr_opcode == OPCODE_JAL) begin
                     branch <=1;
                     PC_temp <= {PC_increment[31:28],J_instr_addr, 2'd0};
-                end
-                OPCODE_R: begin
-                    case(R_instr_func)
-                        FUNC_JR: begin
+            end else if(instr_opcode == OPCODE_R)begin
+                    if(R_instr_func == FUNC_JR)begin
                             branch <= 1;
                             PC_temp<=regRdDataA;
-                        end
-                        FUNC_JALR:begin
+                    end else if(R_instr_func ==  FUNC_JALR) begin
                             branch <=1;
                             PC_temp<=regRdDataA;
-                        end
-
-                        FUNC_MULT:  begin MultSign <=1;  end
-                        FUNC_MULTU: begin MultSign <=0;  end
-
-                        FUNC_DIVU:  begin DivStart <= 1; end
-                        FUNC_DIV:   begin DivStart <= 1; end
-
-                        default: begin end
-                    endcase
-                end
-                default: begin end
-            endcase
+                    end else if(R_instr_func == FUNC_MULT  )  begin 
+                        MultSign <=1;  
+                    end else if(R_instr_func == FUNC_MULTU ) begin 
+                        MultSign <=0;  
+                    end else begin end
+            end else begin end
         end
         if (state==MEM) begin
             $display("CPU-DATAMEM     Rd/Wr MemAddr(ALUOut)= %h,    Write data  (ALUInB0) = %h      Mem WriteEn =  %d, ReadEn =%d, ByteEn = %b, DivDone = %b",ALUOut, regRdDataB,write, read, byteenable, DivDbz,DivDone);
             if (waitrequest || (!DivDone && instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIVU||R_instr_func == FUNC_DIV)) ) begin 
-                DivStart <=0;
             end
             else begin state <= WRITE_BACK; end
 

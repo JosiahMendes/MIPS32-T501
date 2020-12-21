@@ -41,6 +41,10 @@ module mips_cpu_divideru
                 done <= 1;
                 Quotient <= 0;
                 Remainder <= 0;
+            end else if (Divisor > Dividend) begin
+                done <= 1;
+                Quotient <= 0;
+                Remainder <= Dividend;
             end else begin  // initialize values
                 dbz <= 0;
                 done <= 0;
