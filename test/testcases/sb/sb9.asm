@@ -1,0 +1,6 @@
+lui $8 0xbfc0
+addiu $8 $8 0x60
+ori $9 $9 0xed
+sb $9 0xfffd($8)
+jr $0
+lw $2 0xfffc($8)
