@@ -58,7 +58,7 @@ module mips_cpu_divideru
                 Quotient <= q1_next;
                 Remainder <= ac_next >> 1;  // undo final shift
             end else begin  // next iteration
-                i <= i + 1;
+                i <= i + 6'd1;
                 ac <= ac_next;
                 q1 <= q1_next;
             end

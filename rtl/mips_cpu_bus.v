@@ -28,7 +28,7 @@ module mips_cpu_bus(
     //wire [4:0]  R_instr_rs          = instr[25:21];
     //wire [4:0]  R_instr_rt          = instr[20:16];
     wire [4:0]  R_instr_rd          = instr[15:11];
-    wire [4:0]  R_instr_shamt       = instr[10:6];
+    //wire [4:0]  R_instr_shamt       = instr[10:6];
     wire [5:0]  R_instr_func        = instr[5:0];
 
     // I-format instruction sub-sections
@@ -157,7 +157,7 @@ module mips_cpu_bus(
 
     //Reset all modules
     logic moduleReset;
-    assign moduleReset = (reset) ? 1:0;
+    assign moduleReset = (reset) ? 1'b1:1'b0;
 
     //Register Connections
     logic regWriteEn;
@@ -308,7 +308,7 @@ module mips_cpu_bus(
 
         end
         if (state==EXEC) begin
-            $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h      shiftamount", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate,R_instr_shamt);
+            $display("CPU-EXEC,       Register %d (ALUInA) = %h,    Register %d (ALUInB0) = %h,     32'Imm (ALUInB1) is %h      shiftamount", regRdA, regRdDataA, regRdB, regRdDataB,exImmediate,shiftamount);
             state <= MEM;
             if (instr_opcode == OPCODE_J)begin
                     branch <= 1;
