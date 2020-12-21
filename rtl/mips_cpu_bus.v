@@ -208,7 +208,7 @@ module mips_cpu_bus(
     logic [3:0] bytetranslate;
 
 
-    assign bytetranslate = (addresstemp[1:0] == 2'b00) ? 4'b0001 : (addresstemp[1:0] == 2'b01) ? 4'b0010 : (addresstemp[1:0] == 2'b10) ? 4'b0100 : (addresstemp[1:0] == 2'b11) ? 4'b1000 : 4'b1111 ;
+    assign bytetranslate = (addresstemp[1:0] == 2'b00) ? 4'b0001 : (addresstemp[1:0] == 2'b01) ? 4'b0010 : (addresstemp[1:0] == 2'b10) ? 4'b0100 : (addresstemp[1:0] == 2'b11) ? 4'b1000 : 4'b0000 ;
     assign addresstemp = (state == INSTR_FETCH) ? PC : ALUOut;
     assign address = {addresstemp[31:2],2'd0};
 
