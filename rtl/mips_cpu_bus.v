@@ -218,7 +218,15 @@ module mips_cpu_bus(
                                         ||instr_opcode == OPCODE_LWL||instr_opcode == OPCODE_LWR
                                         ||instr_opcode == OPCODE_LB||instr_opcode == OPCODE_LBU))
                     ) ? 1'b1 : 1'b0;
-    assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW ||  instr_opcode == OPCODE_LWL || instr_opcode == OPCODE_LWR ||instr_opcode == OPCODE_SW) && addresstemp[1:0] == 2'b00)) ? 4'b1111
+    assign byteenable = (state==INSTR_FETCH || (state == MEM && (instr_opcode == OPCODE_LW ||instr_opcode == OPCODE_SW) && addresstemp[1:0] == 2'b00)) ? 4'b1111
+                        : (state == MEM & instr_opcode == OPCODE_LWL & addresstemp[1:0] == 2'b00) ? 4'b0001
+                        : (state == MEM & instr_opcode == OPCODE_LWL & addresstemp[1:0] == 2'b01) ? 4'b0011
+                        : (state == MEM & instr_opcode == OPCODE_LWL & addresstemp[1:0] == 2'b10) ? 4'b0111
+                        : (state == MEM & instr_opcode == OPCODE_LWL & addresstemp[1:0] == 2'b11) ? 4'b1111
+                        : (state == MEM & instr_opcode == OPCODE_LWR & addresstemp[1:0] == 2'b00) ? 4'b1111
+                        : (state == MEM & instr_opcode == OPCODE_LWR & addresstemp[1:0] == 2'b01) ? 4'b1110
+                        : (state == MEM & instr_opcode == OPCODE_LWR & addresstemp[1:0] == 2'b10) ? 4'b1100
+                        : (state == MEM & instr_opcode == OPCODE_LWR & addresstemp[1:0] == 2'b11) ? 4'b1000
                         : (state == MEM && (instr_opcode == OPCODE_LB || instr_opcode == OPCODE_LBU || instr_opcode == OPCODE_SB)) ? bytetranslate
                         : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH) & addresstemp[1:0] == 2'b00) ? 4'b0011 
                         : (state == MEM && (instr_opcode == OPCODE_LH || instr_opcode == OPCODE_LHU || instr_opcode == OPCODE_SH) & addresstemp[1:0] == 2'b10) ? 4'b1100

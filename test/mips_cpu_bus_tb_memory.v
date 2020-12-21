@@ -95,9 +95,9 @@ module mips_cpu_bus_tb_memory
                 end
                 4'b1110: begin
                     readdata[7:0]<=0;
-                    readdata[15:8]<=memory[addr+0];
-                    readdata[23:16]<=memory[addr+1];
-                    readdata[31:24]<=memory[addr+2];
+                    readdata[15:8]<=memory[addr+1];
+                    readdata[23:16]<=memory[addr+2];
+                    readdata[31:24]<=memory[addr+3];
                 end
                 4'b0011: begin
                     readdata[7:0]<=memory[addr];
@@ -111,9 +111,9 @@ module mips_cpu_bus_tb_memory
                     readdata[31:24]<=0;
                 end
                 4'b1100: begin
+                    readdata[15:0]<=0;
                     readdata[23:16]<=memory[addr+2];
                     readdata[31:24]<=memory[addr+3];
-                    readdata[15:0]<=0;
                 end
                 4'b0001:begin
                      readdata[7:0]<=memory[addr];
