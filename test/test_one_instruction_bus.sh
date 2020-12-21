@@ -8,6 +8,9 @@ INSTR="$2"
 #check if testcases for instruction exist
 if test -d "test/testcases/${INSTR}" ; then
     #loop through every testcases available
+    rm -f test/testcases/*_MEM*
+    rm -f test/testcases/${INSTR}/*.stdout
+    rm -f test/testcases/${INSTR}/*.vcd
     TESTCASES="test/testcases/${INSTR}/*.asm"
     for i in ${TESTCASES} ; do
 
@@ -17,14 +20,12 @@ if test -d "test/testcases/${INSTR}" ; then
         >&2 echo "  Running Test ${TESTNAME}"
         >&2 echo "    1 - Assembling input file"
 
-        rm -f test/testcases/${INSTR}/${TESTNAME}_MEM.txt
-        rm -f test/testcases/*_MEM*
-        rm -f test/testcases/${INSTR}/${TESTNAME}.stdout
+        rm -f test/testcases/${INSTR}/${TESTNAME}_MEM*.txt
 
         var=$(< test/testcases/${INSTR}/${TESTNAME}.ref)
         fail="FAIL"
 
-        utils/assembler test/testcases/${INSTR}/${TESTNAME}.asm hex littleEndian 1 > test/testcases/${INSTR}/${TESTNAME}_MEM.txt
+        utils/assembler test/testcases/${INSTR}/${TESTNAME}.asm hex littleEndian 1 >| test/testcases/${INSTR}/${TESTNAME}_MEM.txt
 
         >&2 echo "    2 - Compiling test-bench"
         #compile the testbench for this testname
@@ -46,7 +47,9 @@ if test -d "test/testcases/${INSTR}" ; then
         >&2 echo "    3 - Running test-bench"
         set +e
         #run this testname
-        test/testcases/${INSTR}/${TESTNAME} > test/testcases/${INSTR}/${TESTNAME}.stdout
+        test/testcases/${INSTR}/${TESTNAME} >| test/testcases/${INSTR}/${TESTNAME}.stdout
+        mv -f Simulation.vcd test/testcases/${INSTR}/${TESTNAME}.vcd
+
 
         #capture the exit code of the testbench in a variable
         RESULT=$?
@@ -66,10 +69,10 @@ if test -d "test/testcases/${INSTR}" ; then
         NOTHING=""
 
         set +e
-        grep "${PATTERN}" test/testcases/${INSTR}/${TESTNAME}.stdout > test/testcases/${INSTR}/${TESTNAME}.out-lines
+        grep "${PATTERN}" test/testcases/${INSTR}/${TESTNAME}.stdout >| test/testcases/${INSTR}/${TESTNAME}.out-lines
         set -e
 
-        sed -e "s/${PATTERN}/${NOTHING}/g" test/testcases/${INSTR}/${TESTNAME}.out-lines > test/testcases/${INSTR}/${TESTNAME}.out
+        sed -e "s/${PATTERN}/${NOTHING}/g" test/testcases/${INSTR}/${TESTNAME}.out-lines >| test/testcases/${INSTR}/${TESTNAME}.out
 
         rm test/testcases/${INSTR}/${TESTNAME}.out-lines
 
@@ -85,7 +88,7 @@ if test -d "test/testcases/${INSTR}" ; then
             echo "  ${TESTNAME} ${INSTR} Fail - Doesn't Match Given Reference"
         else
             echo "  ${TESTNAME} ${INSTR} Pass"
-            rm test/testcases/${INSTR}/${TESTNAME}.stdout
+            #rm test/testcases/${INSTR}/${TESTNAME}.stdout
             rm test/testcases/${INSTR}/${TESTNAME}_MEM.txt
         fi
         rm test/testcases/${INSTR}/${TESTNAME}
