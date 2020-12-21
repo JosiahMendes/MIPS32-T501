@@ -132,7 +132,7 @@ module mips_cpu_bus_tb_memory
                 4'b0100:begin
                     readdata[15:0]<=0;
                     readdata[23:16]<=memory[addr+2];
-                    readdata[31:8]<=0;
+                    readdata[31:24]<=0;
                 end
                 4'b1000:begin
                     readdata[31:24]<=memory[addr+3];
