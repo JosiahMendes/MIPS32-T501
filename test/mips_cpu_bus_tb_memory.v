@@ -33,7 +33,9 @@ module mips_cpu_bus_tb_memory
 
     always @(posedge clk) begin
         if(write && !read) begin
-            $display("Writing %h to Memory Address %h", writedata, addr);
+            if(addr[1:0] != 2'b00) begin
+                $fatal(1,"Attempted to Write to Non Aligned Address");
+            end
             readdata <= 32'bx;
             case(byteenable)
                 4'b1111: begin
@@ -79,7 +81,10 @@ module mips_cpu_bus_tb_memory
                 default: begin 
                 end
             endcase
-        end else if(read && !write)begin
+        end else if(read && !write) begin
+            if(addr[1:0] != 2'b00) begin
+                $fatal(1,"Attempted to Read from Non Aligned Address");
+            end
             case(byteenable)
                 4'b1111: begin
                     readdata[7:0]<=memory[addr];
