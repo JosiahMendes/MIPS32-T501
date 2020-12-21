@@ -167,6 +167,11 @@ module mips_cpu_bus(
     assign regBLSB = {4{regRdDataB[7:0]}};
     assign regBLSH = {2{regRdDataB[15:0]}};
 
+    wire [4:0] regRdATemp, regRdBTemp;
+    assign regRdATemp = (state == INSTR_DECODE) ? readdata[25:21] : regRdA;
+    assign regRdBTemp = (state == INSTR_DECODE) ? readdata[20:16] : regRdB;
+
+
     logic regWriteEnable;
 
     assign regWriteEnable = !(instr_opcode == OPCODE_R && (R_instr_func == FUNC_MTLO ||R_instr_func == FUNC_MTHI
@@ -408,8 +413,8 @@ module mips_cpu_bus(
     mips_cpu_registers registerInst(
         .clk(clk), .write(regWriteEn), .reset(moduleReset),
         .wrAddr(regDest), .wrData(regDestData),
-        .rdAddrA(readdata[25:21]), .rdDataA(regRdDataA),
-        .rdAddrB(readdata[20:16]), .rdDataB(regRdDataB),
+        .rdAddrA(regRdATemp), .rdDataA(regRdDataA),
+        .rdAddrB(regRdBTemp), .rdDataB(regRdDataB),
         .register_v0(register_v0)
     );
     mips_cpu_ALU ALUInst(
