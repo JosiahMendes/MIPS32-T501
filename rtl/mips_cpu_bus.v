@@ -193,6 +193,7 @@ module mips_cpu_bus(
     //Multiplier Connections
     reg [63:0] MultOut;
     logic MultSign;
+    assign MultSign = (instr_opcode == OPCODE_R && R_instr_func == FUNC_MULT) ? 1'b1:1'b0;
 
     //Divider Connections
     logic [31:0] DivQuotient, DivRemainder;
@@ -253,10 +254,13 @@ module mips_cpu_bus(
             $display("CPU Resetting");
             state <= INSTR_FETCH;
             PC <= 32'hBFC00000;
+            PC_temp <= 32'd0;
             active<=1;
             branch <=0;
             HI <= 0;
             LO <= 0;
+            regDestData <=0;
+            regDestData <=0;
         end
         if (state==INSTR_FETCH) begin
             $display("-------------------------------------------------------------------------------------------------------------PC = %h",PC);
@@ -319,10 +323,6 @@ module mips_cpu_bus(
                     end else if(R_instr_func ==  FUNC_JALR) begin
                             branch <=1;
                             PC_temp<=regRdDataA;
-                    end else if(R_instr_func == FUNC_MULT  )  begin 
-                        MultSign <=1;  
-                    end else if(R_instr_func == FUNC_MULTU ) begin 
-                        MultSign <=0;  
                     end else begin end
             end else begin end
         end
