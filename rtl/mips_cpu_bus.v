@@ -20,6 +20,11 @@ module mips_cpu_bus(
     // This wire holds the whole instruction
     reg[31:0] instr;
 
+    logic [31:0] addresstemp;
+    logic [1:0] addressend;
+    logic [3:0] bytetranslate;
+
+
     wire [5:0]  instr_opcode    = instr[31:26]; // This is common to all instruction formats
 
     // The remaining parts of the instruction depend on the type (R,I,J)
@@ -57,7 +62,7 @@ module mips_cpu_bus(
         OPCODE_BGTZ   = 6'b000111,
         OPCODE_BNE    = 6'b000101,
         OPCODE_SLTI   = 6'b001010,
-        OPCODE_SLTIU = 6'b001011, 
+        OPCODE_SLTIU = 6'b001011,
 
         OPCODE_LB     = 6'b100000,
         OPCODE_LBU    = 6'b100100,
@@ -181,7 +186,7 @@ module mips_cpu_bus(
                             ||(instr_opcode == OPCODE_REGIMM && (I_instr_rt == BGEZ || I_instr_rt == BLTZ)) || instr_opcode == OPCODE_J
                             || instr_opcode == OPCODE_BEQ || instr_opcode == OPCODE_BNE|| instr_opcode == OPCODE_BLEZ ||  instr_opcode == OPCODE_BGTZ
                             || instr_opcode == OPCODE_SB || instr_opcode == OPCODE_SH|| instr_opcode == OPCODE_SW
-                            || ((instr_opcode == OPCODE_LH||instr_opcode == OPCODE_LHU) &&  ALUOut[0] != 0) 
+                            || ((instr_opcode == OPCODE_LH||instr_opcode == OPCODE_LHU) &&  ALUOut[0] != 0)
                             || (instr_opcode == OPCODE_LW && !(ALUOut[0] == 0 && ALUOut[1] == 0)));
 
     //ALU Connections
@@ -207,11 +212,6 @@ module mips_cpu_bus(
     assign DivStart = (state == EXEC && instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU)) ? 1:0;
 
     assign DivSign = (instr_opcode == OPCODE_R && R_instr_func == FUNC_DIV) ? 1'b1 :1'b0;
-
-
-    //Memory Control
-    logic [31:0] addresstemp;
-    logic [3:0] bytetranslate;
 
 
     assign bytetranslate = (addresstemp[1:0] == 2'b00) ? 4'b0001 : (addresstemp[1:0] == 2'b01) ? 4'b0010 : (addresstemp[1:0] == 2'b10) ? 4'b0100 : (addresstemp[1:0] == 2'b11) ? 4'b1000 : 4'b0000 ;
@@ -337,13 +337,13 @@ module mips_cpu_bus(
             end
             else begin state <= WRITE_BACK; end
 
-            if(instr_opcode == OPCODE_BEQ && ALUZero) begin 
+            if(instr_opcode == OPCODE_BEQ && ALUZero) begin
                 branch <= 1;
                 PC_temp <= PC_increment + {{14{I_instr_immediate[15]}},I_instr_immediate, 2'd0};
-            end else if(instr_opcode == OPCODE_BNE && !ALUZero) begin 
+            end else if(instr_opcode == OPCODE_BNE && !ALUZero) begin
                 branch <= 1;
                 PC_temp <= PC_increment + {{14{I_instr_immediate[15]}},I_instr_immediate, 2'd0};
-            end else if(instr_opcode == OPCODE_BGTZ && ALUOut[31] == 0 && !ALUZero) begin 
+            end else if(instr_opcode == OPCODE_BGTZ && ALUOut[31] == 0 && !ALUZero) begin
                 branch <= 1;
                 PC_temp <= PC_increment + {{14{I_instr_immediate[15]}},I_instr_immediate, 2'd0};
             end else if(instr_opcode == OPCODE_BLEZ && (ALUOut[31] == 1 || ALUZero)) begin
@@ -393,7 +393,7 @@ module mips_cpu_bus(
             end else if(instr_opcode == OPCODE_R && (R_instr_func == FUNC_DIV || R_instr_func == FUNC_DIVU)) begin
                 HI <= DivRemainder;
                 LO <= DivQuotient;
-            end 
+            end
             if (branch == 1) begin
                 branch <=2;
                 PC <= PC_increment;

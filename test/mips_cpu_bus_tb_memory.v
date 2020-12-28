@@ -80,7 +80,7 @@ module mips_cpu_bus_tb_memory
                 4'b1000:begin
                     memory[addr+3]<=writedata[31:24];
                 end
-                default: begin 
+                default: begin
                 end
             endcase
         end else if(read && !write) begin
