@@ -1,0 +1,220 @@
+<mxfile host="app.diagrams.net" modified="2020-12-19T21:30:32.467Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15" etag="SJRBOeaE0WV20wreYfgm" version="14.0.4" type="github">
+  <diagram id="22Li71VUwKkU6DOQh4A_" name="Page-1">
+    <mxGraphModel dx="1181" dy="677" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-81" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontSize=10;fontColor=#333333;opacity=40;align=center;dashed=1;strokeWidth=3;strokeColor=#666666;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="330" y="60" width="600" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-1" value="" style="shape=datastore;whiteSpace=wrap;html=1;fillColor=#ffffff;fontSize=9;fontColor=#7EA6E0;opacity=80;align=center;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="510" y="79" width="80" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-2" value="" style="shape=datastore;whiteSpace=wrap;html=1;fillColor=#ffffff;fontSize=9;fontColor=#7EA6E0;opacity=80;align=center;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="640" y="79" width="80" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-3" value="" style="shape=datastore;whiteSpace=wrap;html=1;fillColor=#ffffff;fontSize=9;fontColor=#7EA6E0;opacity=80;align=center;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="770" y="79" width="80" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-4" value="" style="rounded=0;whiteSpace=wrap;html=1;glass=1;fillColor=none;gradientColor=none;fontSize=8;fontColor=#000000;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="330" y="250" width="600" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-108" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeWidth=3;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" source="WKq6BjvcsX_qZIAbAZ6F-56" target="WKq6BjvcsX_qZIAbAZ6F-101">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="900" y="380" />
+              <mxPoint x="900" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-56" value="&lt;b&gt;REGISTERS&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="680" y="320" width="189.5" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-58" value="&lt;font style=&quot;font-size: 29px&quot;&gt;T501 CPU&lt;/font&gt;" style="text;html=1;resizable=0;autosize=1;align=right;verticalAlign=middle;points=[];fillColor=none;strokeColor=none;rounded=0;fontStyle=1;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="360" y="560" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-97" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;startArrow=block;startFill=1;endArrow=block;endFill=1;strokeWidth=3;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" source="WKq6BjvcsX_qZIAbAZ6F-59" target="WKq6BjvcsX_qZIAbAZ6F-56">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-59" value="AVALON&amp;nbsp;&lt;span style=&quot;font-size: 11px ; font-weight: bold ; text-align: left&quot;&gt;®&lt;/span&gt;&lt;br&gt;&amp;nbsp;BUS INTERFACE" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#6c8ebf;opacity=80;fillColor=#D4E1F5;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="330" y="250" width="600" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-66" value="&lt;font color=&quot;#000000&quot; style=&quot;font-size: 11px;&quot;&gt;e.g. RAM&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#7EA6E0;opacity=80;fontStyle=1;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="530" y="111" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-67" value="&lt;font color=&quot;#000000&quot; style=&quot;font-size: 11px&quot;&gt;e.g. DISK A&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#7EA6E0;opacity=80;fontStyle=1;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="657.13" y="111" width="44.25" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-68" value="&lt;font color=&quot;#000000&quot; style=&quot;font-size: 11px;&quot;&gt;e.g.&lt;br style=&quot;font-size: 11px;&quot;&gt;DISK B&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#7EA6E0;opacity=80;fontStyle=1;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="790" y="111" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-82" value="EXTERNAL&amp;nbsp;AVALON ® COMPATIBLE DEVICES" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;fontSize=11;fontColor=#000000;opacity=40;fontStyle=1;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="350" y="71" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-98" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;labelBackgroundColor=#ffffff;startArrow=block;startFill=1;endArrow=none;endFill=0;strokeWidth=3;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" source="WKq6BjvcsX_qZIAbAZ6F-88">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="630" y="400" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="595" y="401" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-88" value="&lt;span style=&quot;font-weight: bold&quot;&gt;MASTER CONTROL UNIT&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="360" y="370" width="210" height="61" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-92" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.151;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" source="WKq6BjvcsX_qZIAbAZ6F-89" target="WKq6BjvcsX_qZIAbAZ6F-88">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-100" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;labelBackgroundColor=#ffffff;startArrow=block;startFill=1;endArrow=none;endFill=0;strokeWidth=3;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" source="WKq6BjvcsX_qZIAbAZ6F-89">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="472" y="530" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="391" y="530" />
+              <mxPoint x="472" y="530" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-89" value="&lt;span style=&quot;font-weight: bold&quot;&gt;IR&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="360" y="460" width="62.87" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-96" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.531;entryY=1.008;entryDx=0;entryDy=0;entryPerimeter=0;labelBackgroundColor=#ffffff;startArrow=none;startFill=0;endArrow=block;endFill=1;strokeWidth=3;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" source="WKq6BjvcsX_qZIAbAZ6F-90" target="WKq6BjvcsX_qZIAbAZ6F-88">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-99" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;labelBackgroundColor=#ffffff;startArrow=block;startFill=1;endArrow=none;endFill=0;strokeWidth=3;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" source="WKq6BjvcsX_qZIAbAZ6F-90">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="630" y="380" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="471" y="530" />
+              <mxPoint x="630" y="530" />
+              <mxPoint x="630" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-111" value="Internal &lt;br&gt;data bus" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" connectable="0" parent="WKq6BjvcsX_qZIAbAZ6F-99">
+          <mxGeometry x="0.5218" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-90" value="&lt;span style=&quot;font-weight: bold&quot;&gt;PC&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="440" y="460" width="62.87" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-101" value="&lt;span style=&quot;font-weight: bold&quot;&gt;MULTIPLIER&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="770" y="460" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-109" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;labelBackgroundColor=#ffffff;startArrow=block;startFill=1;endArrow=none;endFill=0;strokeWidth=3;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" source="WKq6BjvcsX_qZIAbAZ6F-102">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="890" y="480" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="900" y="530" />
+              <mxPoint x="900" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-102" value="&lt;span style=&quot;font-weight: bold&quot;&gt;DIVIDER&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="770" y="510" width="100.75" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-107" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;labelBackgroundColor=#ffffff;startArrow=block;startFill=1;endArrow=none;endFill=0;strokeWidth=3;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" source="WKq6BjvcsX_qZIAbAZ6F-106">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="630" y="502" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="656" y="503" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-106" value="&lt;b&gt;ALU&lt;/b&gt;" style="shape=trapezoid;perimeter=trapezoidPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=none;verticalAlign=middle;horizontal=0;rotation=90;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="670" y="480" width="90" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-112" value="" style="endArrow=none;html=1;labelBackgroundColor=#ffffff;strokeWidth=3;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="900" y="570" as="sourcePoint" />
+            <mxPoint x="900" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-113" value="" style="endArrow=block;html=1;labelBackgroundColor=#ffffff;strokeWidth=3;entryX=1;entryY=0.5;entryDx=0;entryDy=0;startArrow=none;startFill=0;endFill=1;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" target="WKq6BjvcsX_qZIAbAZ6F-106">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="715" y="571" as="sourcePoint" />
+            <mxPoint x="910" y="540" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-114" value="" style="endArrow=none;html=1;labelBackgroundColor=#ffffff;strokeWidth=3;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="900" y="570" as="sourcePoint" />
+            <mxPoint x="716" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-120" value="" style="endArrow=classic;html=1;labelBackgroundColor=#ffffff;strokeColor=#EA6B66;strokeWidth=1;fontColor=#EA6B66;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="660" y="340" as="sourcePoint" />
+            <mxPoint x="680" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-123" value="" style="endArrow=classic;html=1;labelBackgroundColor=#ffffff;strokeColor=#EA6B66;strokeWidth=1;fontColor=#EA6B66;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="670" y="480" as="sourcePoint" />
+            <mxPoint x="692.9" y="479.6" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-125" value="" style="endArrow=classic;html=1;labelBackgroundColor=#ffffff;strokeColor=#EA6B66;strokeWidth=1;fontColor=#EA6B66;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="747.1" y="470.4" as="sourcePoint" />
+            <mxPoint x="770.0000000000001" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-126" value="" style="endArrow=classic;html=1;labelBackgroundColor=#ffffff;strokeColor=#EA6B66;strokeWidth=1;fontColor=#EA6B66;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="747.0999999999999" y="520.4" as="sourcePoint" />
+            <mxPoint x="770" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-128" value="" style="endArrow=none;html=1;labelBackgroundColor=#ffffff;strokeWidth=3;fontColor=#EA6B66;startArrow=block;startFill=1;endFill=0;entryX=0.463;entryY=1.021;entryDx=0;entryDy=0;entryPerimeter=0;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" target="WKq6BjvcsX_qZIAbAZ6F-130">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="396" y="368" as="sourcePoint" />
+            <mxPoint x="396" y="290" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-129" value="" style="endArrow=classic;html=1;labelBackgroundColor=#ffffff;strokeWidth=2;fontColor=#EA6B66;entryX=0.149;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#7EA6E0;dashed=1;exitX=0.44;exitY=-0.018;exitDx=0;exitDy=0;exitPerimeter=0;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" source="WKq6BjvcsX_qZIAbAZ6F-130">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="395" y="250" as="sourcePoint" />
+            <mxPoint x="395.29999999999995" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-130" value="Status Signals" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;opacity=80;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="373" y="255" width="50" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-133" value="" style="endArrow=classic;html=1;labelBackgroundColor=#ffffff;strokeColor=#EA6B66;strokeWidth=1;fontColor=#EA6B66;exitX=0.808;exitY=-0.005;exitDx=0;exitDy=0;exitPerimeter=0;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="499.68000000000006" y="369.69500000000005" as="sourcePoint" />
+            <mxPoint x="500" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-134" value="" style="endArrow=classic;html=1;labelBackgroundColor=#ffffff;strokeColor=#EA6B66;strokeWidth=1;fontColor=#EA6B66;exitX=0.808;exitY=-0.005;exitDx=0;exitDy=0;exitPerimeter=0;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="509.68000000000006" y="369.99500000000006" as="sourcePoint" />
+            <mxPoint x="510" y="350.3" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-135" value="" style="endArrow=classic;html=1;labelBackgroundColor=#ffffff;strokeColor=#EA6B66;strokeWidth=1;fontColor=#EA6B66;exitX=0.808;exitY=-0.005;exitDx=0;exitDy=0;exitPerimeter=0;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="519.6800000000001" y="369.99500000000023" as="sourcePoint" />
+            <mxPoint x="520" y="350.29999999999984" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-136" value="" style="endArrow=classic;html=1;labelBackgroundColor=#ffffff;strokeColor=#EA6B66;strokeWidth=1;fontColor=#EA6B66;exitX=0.808;exitY=-0.005;exitDx=0;exitDy=0;exitPerimeter=0;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="530.0000000000001" y="369.99500000000023" as="sourcePoint" />
+            <mxPoint x="530.32" y="350.29999999999984" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-137" value="Internal control signals&lt;span style=&quot;display: inline; font-size: 10px;&quot;&gt;&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;opacity=80;fontSize=10;fontColor=#EA6B66;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" vertex="1" parent="1">
+          <mxGeometry x="465" y="323" width="115" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="WKq6BjvcsX_qZIAbAZ6F-138" value="" style="endArrow=classic;startArrow=classic;html=1;labelBackgroundColor=#ffffff;strokeColor=#7EA6E0;strokeWidth=3;fontSize=9;fontColor=#EA6B66;exitX=0.516;exitY=-0.049;exitDx=0;exitDy=0;exitPerimeter=0;fontFamily=Avenir;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DAvenir;" edge="1" parent="1" source="WKq6BjvcsX_qZIAbAZ6F-59">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="640" y="240" as="sourcePoint" />
+            <mxPoint x="640" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
