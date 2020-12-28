@@ -11,6 +11,7 @@ if test -d "test/testcases/${INSTR}" ; then
     rm -f test/testcases/*_MEM*
     rm -f test/testcases/${INSTR}/*.stdout
     rm -f test/testcases/${INSTR}/*.vcd
+    rm -f test/testcases/${INSTR}/*.txt
     TESTCASES="test/testcases/${INSTR}/*.asm"
     for i in ${TESTCASES} ; do
 

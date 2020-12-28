@@ -31,7 +31,9 @@ module mips_cpu_bus_tb_memory
         end
     end
 
+
     always @(posedge clk) begin
+        waitrequest = $urandom_range(0,1);
         if(write && !read) begin
             if(addr[1:0] != 2'b00) begin
                 $fatal(1,"Attempted to Write to Non Aligned Address");
@@ -132,7 +134,7 @@ module mips_cpu_bus_tb_memory
                 4'b0100:begin
                     readdata[15:0]<=0;
                     readdata[23:16]<=memory[addr+2];
-                    readdata[31:8]<=0;
+                    readdata[31:24]<=0;
                 end
                 4'b1000:begin
                     readdata[31:24]<=memory[addr+3];
@@ -140,7 +142,7 @@ module mips_cpu_bus_tb_memory
                 end
                 default: begin
                 end
-                endcase
+                endcase 
         end else begin
             readdata <= 32'bx;
         end

@@ -3,6 +3,7 @@ set -eou pipefail
 
 chmod u+x test/test_all_instructions_bus.sh
 chmod u+x test/test_one_instruction_bus.sh
+rm -f utils/assembler
 g++ utils/assemble.cpp -o utils/assembler
 
 SRC="$1"
