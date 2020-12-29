@@ -2,6 +2,21 @@
 
 The specification for this project is available [here](specification.md).
 
+- [MIPS32TM CPU (T501)](#mips32tm-cpu--t501-)
+  * [Key Feature Overview](#key-feature-overview)
+  * [Electronic & Performance Characteristics](#electronic---performance-characteristics)
+- [T501 CPU Architecture Overview](#t501-cpu-architecture-overview)
+    + [Master Control Unit](#master-control-unit)
+    + [ALU, Multiplier, Divider](#alu--multiplier--divider)
+    + [34 32-bit MIPS™ registers](#34-32-bit-mips--registers)
+    + [Avalon® bus interface](#avalon--bus-interface)
+- [Design Decisions](#design-decisions)
+    + [5-cycle design](#5-cycle-design)
+    + [Branch and Jump](#branch-and-jump)
+- [Design Verification Process](#design-verification-process)
+  * [CPU functional unit development](#cpu-functional-unit-development)
+  * [MIPS™ instruction development and testing](#mips--instruction-development-and-testing)
+
 ## Key Feature Overview
 
 - Implements a powerful reduced 32-bit MIPSTM instruction set architecture on a robust IP core
@@ -71,7 +86,9 @@ The industry standard Intel® Avalon® interface is used to communicate and tran
 | out | write       | 1     | Indicate start of write transfer                             |
 | out | read        | 1     | Indicates start of read transfer                             |
 | out | writedata   | 32    | Transferred data from CPU                                    |
-| out | byteenable  | 4     | Indicates byte section that is being written to              |  
+| out | byteenable  | 4     | Indicates byte section that is being written to              |
+
+
 Further information: [Intel® Avalon® Reference](https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/manual/mnl_avalon_spec.pdf)
 
 
